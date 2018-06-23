@@ -1,5 +1,5 @@
 
-$LogShare = "\\wtokiosksccm01\ClientLogs$"
+$LogShare = "\\servername1\ClientLogs$"
 
 # Get path for SCCM client Log files
 $LogPath = Get-ItemProperty -Path "HKLM:\Software\Microsoft\CCM\Logging\@Global"

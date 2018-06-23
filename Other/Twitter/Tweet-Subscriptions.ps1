@@ -1,0 +1,5 @@
+#.\Get-Tweets.ps1 -Hashtag ConfigMgr -ResultType Recent -Recipients "Bernardo Achirica <bernardo@achirica.es>", "Bernardo Achirica <achirica@unicc.org>"
+#.\Get-Tweets.ps1 -Hashtag Intune -ResultType Recent -Recipients "Bernardo Achirica <bernardo@achirica.es>", "Bernardo Achirica <achirica@unicc.org>"
+#.\Get-Tweets.ps1 -Hashtag MSIntune -ResultType Recent -Recipients "Bernardo Achirica <bernardo@achirica.es>", "Bernardo Achirica <achirica@unicc.org>"
+#.\Get-Tweets.ps1 -Hashtag Windows10 -ResultType Recent -Recipients "Bernardo Achirica <bernardo@achirica.es>", "Bernardo Achirica <achirica@unicc.org>"
+.\Get-Tweets.ps1 -User djammmer -ResultType Recent -Recipients "Bernardo Achirica <bernardo@achirica.es>", "Bernardo Achirica <achirica@unicc.org>"

@@ -6,7 +6,7 @@ PARAM(
 	
     [switch]$CurrentUser,
     [switch]$AllUsers,
-    [switch]$DefaultProfile = $true
+    [switch]$DefaultProfile
 )
 
 function Get-TempRegFilePath {

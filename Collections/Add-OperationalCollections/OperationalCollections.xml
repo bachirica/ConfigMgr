@@ -5,8 +5,8 @@
         <folderpath>Administrative\ConfigMgr Client</folderpath>
         <limiting>All Systems</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Client = "1"</query>
-        <refreshinterval>1</refreshinterval>
-        <refreshintervaltype>Days</refreshintervaltype>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>All Systems | Without Client</name>

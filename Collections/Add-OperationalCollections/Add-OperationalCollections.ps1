@@ -42,6 +42,11 @@ param(
 [string]$ScriptPath = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 [string]$LogFile = "$($ScriptPath)\$($ScriptName).log"
 
+[int]$DefaultRecurCount = 7
+[string]$DefaultRecurInterval = "Days"
+[string]$DefaultDescription = "Operational Collection"
+[int]$SchedAddHours = 6
+
 #endregion
 
 # ----------------------------------------------------------------------------------------------------------------------------------------
@@ -100,6 +105,21 @@ Function Initialize-CMModule {
     }
 }
 
+Function Add-FolderPath ([string]$RootFolder, [string]$Path) {
+    if ($Path -like "*\*") {
+        $SplitPath = $Path.split("\")
+        foreach ($item in $SplitPath) {
+            if (!(Test-Path "$($RootFolder)\$($item)")) {
+                New-Item -Path $RootFolder -Name $item -ItemType Directory
+            }
+            $RootFolder = "$($RootFolder)\$($item)"
+        }
+    } else {
+        New-Item -Path $RootFolder -Name $Path -ItemType Directory
+    }
+    Write-ToLog -File $LogFile -Message "Created collection folder $($FolderPath)"
+}
+
 #endregion
 
 # ----------------------------------------------------------------------------------------------------------------------------------------
@@ -128,20 +148,47 @@ foreach ($col in $OpCollections.Collections.Collection) {
     $FolderPath = "$($RootFolder)\$($ColPath)"
 
     if (!(Test-Path $FolderPath)) {
-        if ($ColPath -like "*\*") {
-            $SplitPath = $ColPath.split("\")
-            foreach ($item in $SplitPath) {
-                if (!(Test-Path "$($RootFolder)\$($item)")) {
-                    New-Item -Path $RootFolder -Name $item -ItemType Directory
-                }
-                $RootFolder = "$($RootFolder)\$($item)"
-            }
-        } else {
-            New-Item -Path $RootFolder -Name $ColPath -ItemType Directory
-        }
-        Write-ToLog -File $LogFile -Message "Created collection folder $($FolderPath)"
+        Add-FolderPath -RootFolder $RootFolder -Path $ColPath
     }
 
+    if ($null -ne $col.limiting) {
+        $ColLimiting = $col.limiting
+        if ($null -eq (Get-CMDeviceCollection -Name $ColLimiting).Name) {
+            Write-ToLog "ERROR. Limiting collection does not exist for collection $($ColName)"
+            continue
+        }
+    } else {
+        Write-ToLog -File $LogFile -Message "ERROR. Limiting collection is missing for collection $($ColName)"
+        continue
+    }
+    
+    if ($null -ne $col.description) {
+        $ColDescription = $col.description
+    } else {
+        $ColDescription = $DefaultDescription
+    }
+
+    if ($null -ne $col.recurcount) {
+        $ColRecurCount = $col.recurcount
+    } else {
+        $ColRecurCount = $DefaultRecurCount
+    }
+
+    if ($null -ne $col.recurinterval) {
+        $ColRecurInterval = $col.recurinterval
+    } else {
+        $ColRecurInterval = $DefaultRecurInterval
+    }
+
+    $Schedule = New-CMSchedule -RecurInterval $ColRecurInterval -RecurCount $ColRecurCount -Start (Get-Date).AddHours($SchedAddHours)
+    try {
+        New-CMDeviceCollection -Name $ColName -LimitingCollectionName $ColLimiting -Comment $ColDescription -RefreshSchedule $Schedule -RefreshType 2 | Out-Null
+        Write-ToLog -File $LogFile -Message "Created collection $($ColName)"
+    }
+    catch {
+        Write-ToLog -File $LogFile -Message "ERROR. Error creating collection $($ColName). Error message: $($_.Exception.Message)"
+        exit
+    }
 
 }
 

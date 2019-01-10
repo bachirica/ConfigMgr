@@ -2,8 +2,8 @@
     <collection>
         <name>All Systems | With Client</name>
         <description>Operational Collection</description>
-        <folderpath>Administrative/ConfigMgr Client</folderpath>
-        <limiting>All Systems<limiting>
+        <folderpath>Administrative\ConfigMgr Client</folderpath>
+        <limiting>All Systems</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Client = "1"</query>
         <refreshinterval>1</refreshinterval>
         <refreshintervaltype>Days</refreshintervaltype>
@@ -11,23 +11,23 @@
     <collection>
         <name>All Systems | Without Client</name>
         <description>Operational Collection</description>
-        <folderpath>Administrative/ConfigMgr Client</folderpath>
-        <limiting>All Systems<limiting>
+        <folderpath>Administrative\ConfigMgr Client</folderpath>
+        <limiting>All Systems</limiting>
         <include>All Systems</include>
         <exclude>All Systems | With Client</exclude>
     </collection>
     <collection>
         <name>All Systems | With Client (Active)</name>
         <description>Operational Collection</description>
-        <folderpath>Administrative/ConfigMgr Client</folderpath>
-        <limiting>All Systems | With Client<limiting>
+        <folderpath>Administrative\ConfigMgr Client</folderpath>
+        <limiting>All Systems | With Client</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_CH_ClientSummary on SMS_G_System_CH_ClientSummary.ResourceId = SMS_R_System.ResourceId where SMS_G_System_CH_ClientSummary.ClientActiveStatus = 1</query>
     </collection>
     <collection>
         <name>All Systems | With Client (Inactive)</name>
         <description>Operational Collection</description>
-        <folderpath>Administrative/ConfigMgr Client</folderpath>
-        <limiting>All Systems | With Client<limiting>
+        <folderpath>Administrative\ConfigMgr Client</folderpath>
+        <limiting>All Systems | With Client</limiting>
         <include>All Systems | With Client</include>
         <exclude>All Systems | With Client (Active)</exclude>
     </collection>

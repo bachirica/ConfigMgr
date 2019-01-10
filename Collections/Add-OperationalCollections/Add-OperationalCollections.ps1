@@ -10,6 +10,11 @@
 .EXAMPLE
 #>
 
+# ----------------------------------------------------------------------------------------------------------------------------------------
+# Define Parameters
+# ----------------------------------------------------------------------------------------------------------------------------------------
+#region parameters
+
 [CmdletBinding( SupportsShouldProcess = $False, ConfirmImpact = "None", DefaultParameterSetName = "" ) ]
 param(
     [Parameter(Mandatory=$true)]
@@ -25,6 +30,24 @@ param(
     [string[]]
     $CollectionsXML
 )
+
+#endregion
+
+# ----------------------------------------------------------------------------------------------------------------------------------------
+# Declare Variables
+# ----------------------------------------------------------------------------------------------------------------------------------------
+#region variables
+
+[string]$ScriptName = $($((Split-Path -Path $MyInvocation.MyCommand.Definition -Leaf)).Replace(".ps1",""))
+[string]$ScriptPath = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+[string]$LogFile = "$($ScriptPath)\$($ScriptName).log"
+
+#endregion
+
+# ----------------------------------------------------------------------------------------------------------------------------------------
+# Function Section
+# ----------------------------------------------------------------------------------------------------------------------------------------
+#region function
 
 Function Write-ToLog ([string]$File, [string]$Message) {
     # Simple function that writes a log file with ConfigMgr format to be correctly processed by CMTrace
@@ -77,3 +100,51 @@ Function Initialize-CMModule {
     }
 }
 
+#endregion
+
+# ----------------------------------------------------------------------------------------------------------------------------------------
+# Script Process
+# ----------------------------------------------------------------------------------------------------------------------------------------
+#region process
+
+# Load CM Module
+Initialize-CMModule
+
+# Import XML Data
+[xml]$OpCollections = Get-Content $CollectionsXML
+
+foreach ($col in $OpCollections.Collections.Collection) {
+    $ColName = $col.name
+
+    # Check if collection already exist
+    if ((Get-CMDeviceCollection -Name $ColName).Name -eq $ColName) {
+        Write-ToLog -File $LogFile -Message "Collection $($ColName) already exist. Skipping"
+        continue
+    }
+
+    # Check and create the folder path
+    $RootFolder = "$($SiteCode):\DeviceCollection"
+    $ColPath = $col.folderpath
+    $FolderPath = "$($RootFolder)\$($ColPath)"
+
+    if (!(Test-Path $FolderPath)) {
+        if ($ColPath -like "*\*") {
+            $SplitPath = $ColPath.split("\")
+            foreach ($item in $SplitPath) {
+                if (!(Test-Path "$($RootFolder)\$($item)")) {
+                    New-Item -Path $RootFolder -Name $item -ItemType Directory
+                }
+                $RootFolder = "$($RootFolder)\$($item)"
+            }
+        } else {
+            New-Item -Path $RootFolder -Name $ColPath -ItemType Directory
+        }
+        Write-ToLog -File $LogFile -Message "Created collection folder $($FolderPath)"
+    }
+
+
+}
+
+
+
+#endregion

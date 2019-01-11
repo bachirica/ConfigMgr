@@ -137,7 +137,7 @@ Function Add-CollectionQuery ([string]$ColName, [string]$Query) {
         Write-ToLog -File $LogFile -Message "Added collection membership query to collection $($ColName)"
     }
     catch {
-        Write-ToLog -File $LogFile -Message "ERROR. Could not add collection membership query to collection $($ColName)"
+        Write-ToLog -File $LogFile -Message "ERROR. Could not add collection membership query to collection $($ColName). Error message: $($_.Exception.Message)"
     }
 }
 
@@ -148,7 +148,7 @@ Function Add-CollectionInclude ([string]$ColName, [string]$Include) {
             Write-ToLog -File $LogFile -Message "Added include membership rule to collection $($ColName)"
         }
         catch {
-            Write-ToLog -File $LogFile -Message "ERROR. Could not add include membership rule to collection $($ColName)"
+            Write-ToLog -File $LogFile -Message "ERROR. Could not add include membership rule to collection $($ColName). Error message: $($_.Exception.Message)"
         }
     } else {
         Write-ToLog -File $LogFile -Message "ERROR. Include membership collection $($Include) doesn't exist. Couldn't be added to collection $($ColName)"
@@ -162,7 +162,7 @@ Function Add-CollectionExclude ([string]$ColName, [string]$Exclude) {
             Write-ToLog -File $LogFile -Message "Added exclude membership rule to collection $($ColName)"
         }
         catch {
-            Write-ToLog -File $LogFile -Message "ERROR. Could not add exclude membership rule to collection $($ColName)"
+            Write-ToLog -File $LogFile -Message "ERROR. Could not add exclude membership rule to collection $($ColName). Error message: $($_.Exception.Message)"
         }
     } else {
         Write-ToLog -File $LogFile -Message "ERROR. Exclude membership collection $($Exclude) doesn't exist. Couldn't be added to collection $($ColName)"
@@ -233,6 +233,9 @@ foreach ($col in $OpCollections.Collections.Collection) {
     # Create the empty collection
     Add-Collection -ColName $ColName -ColLimiting $ColLimiting -ColDescription $ColDescription -ColRecurInterval $ColRecurInterval -ColRecurCount $ColRecurCount
 
+    # Move the collection to their corresponding folder
+    Move-CMObject -FolderPath $FolderPath -InputObject (Get-CMDeviceCollection -Name $ColName)
+
     # Check for query membership rules for the collection
     $ColQueries = $col.query
 
@@ -255,10 +258,12 @@ foreach ($col in $OpCollections.Collections.Collection) {
     $ColExclude = $col.exclude
 
     if ($ColExclude.Length -gt 0) {
-        foreach ($Eclude in $ColExclude) {
+        foreach ($Exclude in $ColExclude) {
             Add-CollectionExclude -ColName $ColName -Exclude $Exclude
         }
     }
+
+
 
 }
 

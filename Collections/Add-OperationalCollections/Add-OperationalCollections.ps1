@@ -18,16 +18,16 @@
 [CmdletBinding( SupportsShouldProcess = $False, ConfirmImpact = "None", DefaultParameterSetName = "" ) ]
 param(
     [Parameter(Mandatory=$true)]
-    [string[]]
+    [string]
     $SiteServer,
 
     [Parameter(Mandatory=$true)]
-    [string[]]
+    [string]
     $SiteCode,
 
     [Parameter(Mandatory=$true)]
     [ValidateScript({Test-Path $(Split-Path $_) -PathType 'Container'})] 
-    [string[]]
+    [string]
     $CollectionsXML
 )
 

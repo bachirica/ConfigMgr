@@ -1,13 +1,28 @@
 <#
 .SYNOPSIS
+    Create ConfigMgr operational collections based on a XML definition file
 
 .DESCRIPTION
+    Creates ConfigMgr collections imported from an XML file
+    See XML file for additional definition information
+
+.PARAMETER SiteServer
+    [Mandatory] ConfigMgr Site Server FQDN
 
 .PARAMETER SiteCode
+    [Mandatory] ConfigMgr Site Code (3 characters)
+
+.PARAMETER CollectionsXML
+    [Mandatory] XML file path containing collection definition
 
 .NOTES
+    Author: Bernardo Achirica (@bachirica)
+    Version: 1.0
+    Date: 2019.01.11
+    References: Idea based on Mark Allen's script (https://github.com/markhallen/configmgr/tree/master/New-CMOperationalCollections)
 
 .EXAMPLE
+    .\Add-OperationalCollections.ps1 -SiteServer mysccmserver.mydomain.local -SiteCode PR1 -CollectionsXML .\OperationalCollections.xml
 #>
 
 # ----------------------------------------------------------------------------------------------------------------------------------------
@@ -38,14 +53,20 @@ param(
 # ----------------------------------------------------------------------------------------------------------------------------------------
 #region variables
 
-[string]$ScriptName = $($((Split-Path -Path $MyInvocation.MyCommand.Definition -Leaf)).Replace(".ps1",""))
-[string]$ScriptPath = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
-[string]$LogFile = "$($ScriptPath)\$($ScriptName).log"
-
+# Default values used for some parameters if they're not specified in the XML
 [int]$DefaultRecurCount = 7
 [string]$DefaultRecurInterval = "Days"
 [string]$DefaultDescription = "Operational Collection"
-[int]$SchedAddHours = 6
+
+# $SchedAddHours adds some extra hours to the collection evaluation schedule
+# If a collection refreshes every 7 days, it'll do it always at the same time the collection was created (probably during office hours)
+# Adding a few hours can allow you to schedule those refresh cycles outside office hours
+[int]$SchedAddHours = 6 
+
+# Log file location definition
+[string]$ScriptName = $($((Split-Path -Path $MyInvocation.MyCommand.Definition -Leaf)).Replace(".ps1",""))
+[string]$ScriptPath = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+[string]$LogFile = "$($ScriptPath)\$($ScriptName).log"
 
 #endregion
 
@@ -262,11 +283,6 @@ foreach ($col in $OpCollections.Collections.Collection) {
             Add-CollectionExclude -ColName $ColName -Exclude $Exclude
         }
     }
-
-
-
 }
-
-
 
 #endregion

@@ -141,6 +141,14 @@ Function Add-FolderPath ([string]$RootFolder, [string]$Path) {
     Write-ToLog -File $LogFile -Message "Created collection folder $($FolderPath)"
 }
 
+function Get-DefaultIfNull ([string]$XMLValue, [string]$Default) {
+    if ($null -ne $XMLValue) {
+        return $XMLValue 
+    } else {
+        return $Default
+    }
+}
+
 Function Add-Collection ([string]$ColName, [string]$ColLimiting, [string]$ColDescription, [string]$ColRecurInterval, [int]$ColRecurCount) {
     $Schedule = New-CMSchedule -RecurInterval $ColRecurInterval -RecurCount $ColRecurCount -Start (Get-Date).AddHours($SchedAddHours)
     try {
@@ -232,24 +240,10 @@ foreach ($col in $OpCollections.Collections.Collection) {
         Write-ToLog -File $LogFile -Message "ERROR. Limiting collection is missing for collection $($ColName)"
         continue
     }
-    
-    if ($null -ne $col.description) {
-        $ColDescription = $col.description
-    } else {
-        $ColDescription = $DefaultDescription
-    }
 
-    if ($null -ne $col.recurcount) {
-        $ColRecurCount = $col.recurcount
-    } else {
-        $ColRecurCount = $DefaultRecurCount
-    }
-
-    if ($null -ne $col.recurinterval) {
-        $ColRecurInterval = $col.recurinterval
-    } else {
-        $ColRecurInterval = $DefaultRecurInterval
-    }
+    $ColDescription = Get-DefaultIfNull -XMLValue $col.description -Default $DefaultDescription
+    $ColRecurCount = Get-DefaultIfNull -XMLValue $col.recurcount -Default $DefaultRecurCount
+    $ColRecurInterval = Get-DefaultIfNull -XMLValue $col.recurinterval -Default $DefaultRecurInterval
 
     # Create the empty collection
     Add-Collection -ColName $ColName -ColLimiting $ColLimiting -ColDescription $ColDescription -ColRecurInterval $ColRecurInterval -ColRecurCount $ColRecurCount

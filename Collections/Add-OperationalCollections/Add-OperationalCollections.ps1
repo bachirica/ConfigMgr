@@ -120,6 +120,55 @@ Function Add-FolderPath ([string]$RootFolder, [string]$Path) {
     Write-ToLog -File $LogFile -Message "Created collection folder $($FolderPath)"
 }
 
+Function Add-Collection ([string]$ColName, [string]$ColLimiting, [string]$ColDescription, [string]$ColRecurInterval, [int]$ColRecurCount) {
+    $Schedule = New-CMSchedule -RecurInterval $ColRecurInterval -RecurCount $ColRecurCount -Start (Get-Date).AddHours($SchedAddHours)
+    try {
+        New-CMDeviceCollection -Name $ColName -LimitingCollectionName $ColLimiting -Comment $ColDescription -RefreshSchedule $Schedule -RefreshType 2 | Out-Null
+        Write-ToLog -File $LogFile -Message "Created collection $($ColName)"
+    }
+    catch {
+        Write-ToLog -File $LogFile -Message "ERROR. Error creating collection $($ColName). Error message: $($_.Exception.Message)"
+    }
+}
+
+Function Add-CollectionQuery ([string]$ColName, [string]$Query) {
+    try {
+        Add-CMDeviceCollectionQueryMembershipRule -CollectionName $ColName -RuleName $ColName -QueryExpression $Query
+        Write-ToLog -File $LogFile -Message "Added collection membership query to collection $($ColName)"
+    }
+    catch {
+        Write-ToLog -File $LogFile -Message "ERROR. Could not add collection membership query to collection $($ColName)"
+    }
+}
+
+Function Add-CollectionInclude ([string]$ColName, [string]$Include) {
+    if ((Get-CMDeviceCollection -Name $ColName).Name -eq $ColName) {
+        try {
+            Add-CMDeviceCollectionIncludeMembershipRule -CollectionName $ColName -IncludeCollectionName $Include
+            Write-ToLog -File $LogFile -Message "Added include membership rule to collection $($ColName)"
+        }
+        catch {
+            Write-ToLog -File $LogFile -Message "ERROR. Could not add include membership rule to collection $($ColName)"
+        }
+    } else {
+        Write-ToLog -File $LogFile -Message "ERROR. Include membership collection $($Include) doesn't exist. Couldn't be added to collection $($ColName)"
+    }
+}
+
+Function Add-CollectionExclude ([string]$ColName, [string]$Exclude) {
+    if ((Get-CMDeviceCollection -Name $ColName).Name -eq $ColName) {
+        try {
+            Add-CMDeviceCollectionExcludeMembershipRule -CollectionName $ColName -ExcludeCollectionName $Exclude
+            Write-ToLog -File $LogFile -Message "Added exclude membership rule to collection $($ColName)"
+        }
+        catch {
+            Write-ToLog -File $LogFile -Message "ERROR. Could not add exclude membership rule to collection $($ColName)"
+        }
+    } else {
+        Write-ToLog -File $LogFile -Message "ERROR. Exclude membership collection $($Exclude) doesn't exist. Couldn't be added to collection $($ColName)"
+    }
+}
+
 #endregion
 
 # ----------------------------------------------------------------------------------------------------------------------------------------
@@ -151,6 +200,7 @@ foreach ($col in $OpCollections.Collections.Collection) {
         Add-FolderPath -RootFolder $RootFolder -Path $ColPath
     }
 
+    # Gather from the XML the necessary data to create the collection
     if ($null -ne $col.limiting) {
         $ColLimiting = $col.limiting
         if ($null -eq (Get-CMDeviceCollection -Name $ColLimiting).Name) {
@@ -180,14 +230,34 @@ foreach ($col in $OpCollections.Collections.Collection) {
         $ColRecurInterval = $DefaultRecurInterval
     }
 
-    $Schedule = New-CMSchedule -RecurInterval $ColRecurInterval -RecurCount $ColRecurCount -Start (Get-Date).AddHours($SchedAddHours)
-    try {
-        New-CMDeviceCollection -Name $ColName -LimitingCollectionName $ColLimiting -Comment $ColDescription -RefreshSchedule $Schedule -RefreshType 2 | Out-Null
-        Write-ToLog -File $LogFile -Message "Created collection $($ColName)"
+    # Create the empty collection
+    Add-Collection -ColName $ColName -ColLimiting $ColLimiting -ColDescription $ColDescription -ColRecurInterval $ColRecurInterval -ColRecurCount $ColRecurCount
+
+    # Check for query membership rules for the collection
+    $ColQueries = $col.query
+
+    if ($ColQueries.Length -gt 0) {
+        foreach ($Query in $ColQueries) {
+            Add-CollectionQuery -ColName $ColName -Query $Query
+        }
     }
-    catch {
-        Write-ToLog -File $LogFile -Message "ERROR. Error creating collection $($ColName). Error message: $($_.Exception.Message)"
-        exit
+
+    # Check for include membership rules for the collection
+    $ColInclude = $col.include
+
+    if ($ColInclude.Length -gt 0) {
+        foreach ($Include in $ColInclude) {
+            Add-CollectionInclude -ColName $ColName -Include $Include
+        }
+    }
+   
+    # Check for exclude membership rules for the collection
+    $ColExclude = $col.exclude
+
+    if ($ColExclude.Length -gt 0) {
+        foreach ($Eclude in $ColExclude) {
+            Add-CollectionExclude -ColName $ColName -Exclude $Exclude
+        }
     }
 
 }

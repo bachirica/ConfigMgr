@@ -43,7 +43,11 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateScript({Test-Path $(Split-Path $_) -PathType 'Container'})] 
     [string]
-    $CollectionsXML
+    $CollectionsXML,
+
+    [Parameter(Mandatory=$false)]
+    [switch]
+    $Maintain
 )
 
 #endregion
@@ -216,8 +220,12 @@ foreach ($col in $OpCollections.Collections.Collection) {
 
     # Check if collection already exist
     if ((Get-CMDeviceCollection -Name $ColName).Name -eq $ColName) {
-        Write-ToLog -File $LogFile -Message "Collection $($ColName) already exist. Skipping"
-        continue
+        if ($Maintain) {
+            Write-Host "Collection exist and Switch active"
+        } else {
+            Write-ToLog -File $LogFile -Message "Collection $($ColName) already exist. Skipping"
+            continue
+        }
     }
 
     # Check and create the folder path

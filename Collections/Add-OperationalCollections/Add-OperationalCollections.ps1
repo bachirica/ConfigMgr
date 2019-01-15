@@ -202,6 +202,138 @@ Function Add-CollectionExclude ([string]$ColName, [string]$Exclude) {
     }
 }
 
+function Compare-HashTables ($hashXML, $hashCol) {
+    $hashNotInCol = @{}
+    $hashNotInXML = @{}
+    foreach ($Item in $hashXML) {
+        if (!($hashCol.ContainsValue("$($Item.Values)"))) {
+            $hashNotInCol.Add("$($Item.Keys)", "$($Item.Values)")
+        }
+    }
+    foreach ($Item in $hashCol) {
+        if (!($hashXML.ContainsValue("$($Item.Values)"))) {
+            $hashNotInXML.Add("$($Item.Keys)", "$($Item.Values)")
+        }
+    }
+    "NotInXML: "
+    $hashNotInXML
+    "NotInCol: "
+    $hashNotInCol
+}
+
+function Reset-Collection ([string]$ColName, $ColXML) {
+    $CMCol = Get-CMDeviceCollection -Name $ColName
+
+    # Check limiting collection
+    if ($CMCol.LimitToCollectionName -ne $ColXML.limiting) {
+        try {
+            Set-CMCollection -InputObject $CMCol -LimitingCollectionName $ColXML.limiting
+            Write-ToLog -File $LogFile -Message "$($ColName). Corrected limiting collection to $($ColXML.limiting)"
+        }
+        catch {
+            Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not correct limiting collection to $($ColXML.limiting). Error message: $($_.Exception.Message)"
+        }
+    }
+
+    # Check description
+    if ($CMCol.Comment -ne $ColXML.description) {
+        try {
+            Set-CMCollection -InputObject $CMCol -Comment $ColXML.description
+            Write-ToLog -File $LogFile -Message "$($ColName). Corrected collection comment"
+        }
+        catch {
+            Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not correct collection comment. Error message: $($_.Exception.Message)"
+        }
+    }
+
+    # Check refresh type
+    if ($CMCol.RefreshType -ne 2) {
+        try {
+            Set-CMCollection -InputObject $CMCol -RefreshType 2
+            Write-ToLog -File $LogFile -Message "$($ColName). Corrected refresh type"
+        }
+        catch {
+            Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not correct refresh type. Error message: $($_.Exception.Message)"
+        }
+    }
+
+    # Check refresh schedule
+    $ColRecurCount = Get-DefaultIfNull -XMLValue $col.recurcount -Default $DefaultRecurCount
+    $ColRecurInterval = Get-DefaultIfNull -XMLValue $col.recurinterval -Default $DefaultRecurInterval
+    $ToCorrect = $false
+
+    switch ($ColRecurInterval) {
+        "Minutes" {
+            if ($CMCol.RefreshSchedule.MinuteSpan -ne $ColRecurCount) {
+                $ToCorrect = $true
+            }
+        }
+        "Hours" {
+            if ($CMCol.RefreshSchedule.HourSpan -ne $ColRecurCount) {
+                $ToCorrect = $true
+            }
+        }
+        "Days" {
+            if ($CMCol.RefreshSchedule.DaySpan -ne $ColRecurCount) {
+                $ToCorrect = $true
+            }
+        }
+    }
+
+    if ($ToCorrect) {
+        $Schedule = New-CMSchedule -RecurInterval $ColRecurInterval -RecurCount $ColRecurCount -Start (Get-Date).AddHours($SchedAddHours)
+
+        try {
+            Set-CMCollection -InputObject $CMCol -RefreshSchedule $Schedule
+            Write-ToLog -File $LogFile -Message "$($ColName). Corrected refresh schedule"
+        }
+        catch {
+            Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not correct refresh schedule. Error message: $($_.Exception.Message)"
+        }
+    }
+
+    # TODO!! Check collection queries
+    #
+    # $XMLQueries = $ColXML.query
+    # $i = 1
+    # $hashXML = @{}
+    # $hashCol = @{}
+
+    # if ($XMLQueries.Length -gt 0) {
+    #     foreach ($Query in $XMLQueries) {
+    #         $hashXML.Add("$($i)", "$($Query)")
+    #         $i++
+    #     }
+    # }
+
+    # $ColQueries = Get-CMCollectionQueryMembershipRule -CollectionName $ColName
+    # if ($ColQueries.Length -gt 0) {
+    #     foreach ($Query in $ColQueries) {
+    #         $hashCol.Add("$($Query.QueryID)", "$($Query.QueryExpression)")
+    #     }
+    # }
+
+    # Compare-HashTables -hashXML $hashXML -hashCol $hashCol
+
+    #TODO. Replace queries
+    #THIS HAS TO BE REPLACED BY COMPARING THE QUERIES AND ONLY CORRECTING WHATS NECESSARY
+
+    $colQueries = Get-CMDeviceCollectionQueryMembershipRule -InputObject $CMCol
+    foreach ($Query in $colQueries) {
+        Remove-CMDeviceCollectionQueryMembershipRule -InputObject $CMCol -RuleName $Query.RuleName -Force
+        
+    }
+
+    $colQueries = $col.query
+    if ($colQueries.Length -gt 0) {
+        foreach ($Query in $ColQueries) {
+            Add-CollectionQuery -ColName $ColName -Query $Query
+        }
+    }
+
+}
+
+
 #endregion
 
 # ----------------------------------------------------------------------------------------------------------------------------------------
@@ -221,9 +353,11 @@ foreach ($col in $OpCollections.Collections.Collection) {
     # Check if collection already exist
     if ((Get-CMDeviceCollection -Name $ColName).Name -eq $ColName) {
         if ($Maintain) {
-            Write-Host "Collection exist and Switch active"
+            Write-ToLog -File $LogFile -Message "$($ColName). Collection already exist. Maintenance enabled"
+            Reset-Collection -ColName $ColName -ColXML $col
+            continue
         } else {
-            Write-ToLog -File $LogFile -Message "Collection $($ColName) already exist. Skipping"
+            Write-ToLog -File $LogFile -Message "$($ColName). Collection already exist. Skipping, maintenance not enabled"
             continue
         }
     }

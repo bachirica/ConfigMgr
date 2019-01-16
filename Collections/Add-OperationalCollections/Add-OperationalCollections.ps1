@@ -290,7 +290,13 @@ function Reset-Collection ([string]$ColName, $ColXML) {
     }
 
     # Remove all direct memberships
-    Get-CMDeviceCollectionDirectMembershipRule -CollectionName $ColName | ForEach-Object {Remove-CMDeviceCollectionDirectMembershipRule -CollectionName $ColName -ResourceId $_.ResourceID -Force}
+    try {
+        Get-CMDeviceCollectionDirectMembershipRule -CollectionName $ColName | ForEach-Object {Remove-CMDeviceCollectionDirectMembershipRule -CollectionName $ColName -ResourceId $_.ResourceID -Force}
+        Write-ToLog -File $LogFile -Message "$($ColName). Removed direct membership rules"
+    }
+    catch {
+        Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not remove direct membership rules. Error message: $($_.Exception.Message)"
+    }
 
     # Check collection queries
     $XMLQueries = $ColXML.query
@@ -339,6 +345,10 @@ function Reset-Collection ([string]$ColName, $ColXML) {
             }
         }
     }
+
+    # Check include membership rules
+    
+    # Check exclude membership rules
 }
 
 

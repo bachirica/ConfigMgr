@@ -289,6 +289,9 @@ function Reset-Collection ([string]$ColName, $ColXML) {
         }
     }
 
+    # Remove all direct memberships
+    Get-CMDeviceCollectionDirectMembershipRule -CollectionName $ColName | ForEach-Object {Remove-CMDeviceCollectionDirectMembershipRule -CollectionName $ColName -ResourceId $_.ResourceID -Force}
+
     # Check collection queries
     $XMLQueries = $ColXML.query
     $i = 1
@@ -324,7 +327,7 @@ function Reset-Collection ([string]$ColName, $ColXML) {
             }
         }
     }
-    
+
     if ($hashNotInCol.Count -gt 0) {
         foreach ($h in $hashNotInCol.Keys) {
             try {

@@ -202,23 +202,20 @@ Function Add-CollectionExclude ([string]$ColName, [string]$Exclude) {
     }
 }
 
-function Compare-HashTables ($hashXML, $hashCol) {
-    $hashNotInCol = @{}
-    $hashNotInXML = @{}
-    foreach ($Item in $hashXML) {
-        if (!($hashCol.ContainsValue("$($Item.Values)"))) {
-            $hashNotInCol.Add("$($Item.Keys)", "$($Item.Values)")
+function Compare-HashTables ([hashtable]$hashXML, [hashtable]$hashCol, [hashtable]$hashNotInXML, [hashtable]$hashNotInCol) {
+    foreach ($h in $hashXML.Keys) {
+        $query = "$($hashXML.Item($h))"
+        if (!($hashCol.ContainsValue($query))) {
+            $hashNotInCol.Add(${h}, $hashXML.Item($h))
         }
     }
-    foreach ($Item in $hashCol) {
-        if (!($hashXML.ContainsValue("$($Item.Values)"))) {
-            $hashNotInXML.Add("$($Item.Keys)", "$($Item.Values)")
+    
+    foreach ($h in $hashCol.Keys) {
+        $query = "$($hashCol.Item($h))"
+        if (!($hashXML.ContainsValue($query))) {
+            $hashNotInXML.Add(${h}, $hashCol.Item($h))
         }
-    }
-    "NotInXML: "
-    $hashNotInXML
-    "NotInCol: "
-    $hashNotInCol
+    }    
 }
 
 function Reset-Collection ([string]$ColName, $ColXML) {
@@ -292,45 +289,53 @@ function Reset-Collection ([string]$ColName, $ColXML) {
         }
     }
 
-    # TODO!! Check collection queries
-    #
-    # $XMLQueries = $ColXML.query
-    # $i = 1
-    # $hashXML = @{}
-    # $hashCol = @{}
+    # Check collection queries
+    $XMLQueries = $ColXML.query
+    $i = 1
+    $hashXML = @{}
+    $hashCol = @{}
+    $hashNotInCol = @{} # Elements in XML and not in the collection (to be added)
+    $hashNotInXML = @{} # Elements in collection and not in the XML (to be removed)
 
-    # if ($XMLQueries.Length -gt 0) {
-    #     foreach ($Query in $XMLQueries) {
-    #         $hashXML.Add("$($i)", "$($Query)")
-    #         $i++
-    #     }
-    # }
-
-    # $ColQueries = Get-CMCollectionQueryMembershipRule -CollectionName $ColName
-    # if ($ColQueries.Length -gt 0) {
-    #     foreach ($Query in $ColQueries) {
-    #         $hashCol.Add("$($Query.QueryID)", "$($Query.QueryExpression)")
-    #     }
-    # }
-
-    # Compare-HashTables -hashXML $hashXML -hashCol $hashCol
-
-    #TODO. Replace queries
-    #THIS HAS TO BE REPLACED BY COMPARING THE QUERIES AND ONLY CORRECTING WHATS NECESSARY
-
-    $colQueries = Get-CMDeviceCollectionQueryMembershipRule -InputObject $CMCol
-    foreach ($Query in $colQueries) {
-        Remove-CMDeviceCollectionQueryMembershipRule -InputObject $CMCol -RuleName $Query.RuleName -Force
-        
-    }
-
-    $colQueries = $col.query
-    if ($colQueries.Length -gt 0) {
-        foreach ($Query in $ColQueries) {
-            Add-CollectionQuery -ColName $ColName -Query $Query
+    if ($XMLQueries.Length -gt 0) {
+        foreach ($Query in $XMLQueries) {
+            $hashXML.Add("$($i)", "$($Query)")
+            $i++
         }
     }
 
+    $ColQueries = Get-CMCollectionQueryMembershipRule -CollectionName $ColName
+    if ($ColQueries.Count -gt 0) {
+        foreach ($Query in $ColQueries) {
+            $hashCol.Add("$($Query.RuleName)", "$($Query.QueryExpression)")
+        }
+    }
+
+    Compare-HashTables -hashXML $hashXML -hashCol $hashCol -hashNotInXML $hashNotInXML -hashNotInCol $hashNotInCol
+
+    if ($hashNotInXML.Count -gt 0) {
+        foreach ($h in $hashNotInXML.Keys) {
+            try {
+                Remove-CMDeviceCollectionQueryMembershipRule -CollectionName $ColName -RuleName $h -Force
+                Write-ToLog -File $LogFile -Message "$($ColName). Removed query membership rule"
+            }
+            catch {
+                Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not remove query membership rule. Error message: $($_.Exception.Message)"
+            }
+        }
+    }
+    
+    if ($hashNotInCol.Count -gt 0) {
+        foreach ($h in $hashNotInCol.Keys) {
+            try {
+                Add-CMDeviceCollectionQueryMembershipRule -CollectionName $ColName -RuleName $ColName -QueryExpression "$($hashNotInCol.Item($h))"
+                Write-ToLog -File $LogFile -Message "$($ColName). Added query membership rule"
+            }
+            catch {
+                Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not add query membership rule. Error message: $($_.Exception.Message)"
+            }
+        }
+    }
 }
 
 

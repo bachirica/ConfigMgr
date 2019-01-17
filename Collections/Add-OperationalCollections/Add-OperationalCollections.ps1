@@ -243,9 +243,11 @@ function Reset-Collection ([string]$ColName, $ColXML) {
     }
 
     # Check description
-    if ($CMCol.Comment -ne $ColXML.description) {
+    $ColDescription = Get-DefaultIfNull -XMLValue $ColXML.description -Default $DefaultDescription
+
+    if ($CMCol.Comment -ne $ColDescription) {
         try {
-            Set-CMCollection -InputObject $CMCol -Comment $ColXML.description
+            Set-CMCollection -InputObject $CMCol -Comment $ColDescription
             Write-ToLog -File $LogFile -Message "$($ColName). Corrected collection comment"
         }
         catch {
@@ -465,7 +467,6 @@ function Reset-Collection ([string]$ColName, $ColXML) {
         }
     }
 }
-
 
 #endregion
 

@@ -1,6 +1,6 @@
 # Add-OperationalCollections
 
-Script to import and maintain the collections defined in an XML into SCCM. Each collection accepts the following fields in the XML definition
+Script to import and maintain the collections defined in an XML into SCCM. Each collection accepts the following fields in the XML definition:
 
 - **Name**: Mandatory
 - **Description**: Optional
@@ -20,4 +20,4 @@ Creates the collections found in the XML. Already existing collections are not m
 ```
 .\Add-OperationalCollections.ps1 -SiteServer mysccmserver.mydomain.local -SiteCode PR1 -CollectionsXML .\OperationalCollections.xml -Maintain
 ```
-Creates the collections found in the XML. Already existing collections settings are corrected if they deviate from the XML definition
+Using the `-Maintain` parameter creates the collections found in the XML and already existing collections settings are corrected if they deviate from the XML definition

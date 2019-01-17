@@ -508,7 +508,7 @@ foreach ($col in $OpCollections.Collections.Collection) {
         if ($null -ne $col.limiting) {
             $ColLimiting = $col.limiting
             if ($null -eq (Get-CMDeviceCollection -Name $ColLimiting).Name) {
-                Write-ToLog "ERROR. $($ColName). Limiting collection does not exist"
+                Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Limiting collection does not exist"
                 continue
             }
         } else {

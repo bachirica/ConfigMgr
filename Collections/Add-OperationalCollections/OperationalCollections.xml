@@ -175,7 +175,13 @@ Each collection accepts the following fields:
         <name>OS | Windows Server | Windows Server 2016</name>
         <folderpath>Administrative\Operating System</folderpath>
         <limiting>OS | Windows Server</limiting>
-        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Server 10.0%" or SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Advanced Server 10.0%"</query>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.14393"</query>
+    </collection>
+    <collection>
+        <name>OS | Windows Server | Windows Server 2019</name>
+        <folderpath>Administrative\Operating System</folderpath>
+        <limiting>OS | Windows Server</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.17763"</query>
     </collection>
     <collection>
         <name>OS | Windows Server | Other</name>
@@ -186,6 +192,7 @@ Each collection accepts the following fields:
         <exclude>OS | Windows Server | Windows Server 2012</exclude>
         <exclude>OS | Windows Server | Windows Server 2012 R2</exclude>
         <exclude>OS | Windows Server | Windows Server 2016</exclude>
+        <exclude>OS | Windows Server | Windows Server 2019</exclude>
     </collection>
     <collection>
         <name>WaaS | Windows 10 Current Branch (CB)</name>

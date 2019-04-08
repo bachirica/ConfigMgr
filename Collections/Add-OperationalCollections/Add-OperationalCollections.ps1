@@ -404,7 +404,7 @@ function Reset-Collection ([string]$ColName, $ColXML) {
         }
 
         if ($hashNotInCol.Count -gt 0) {
-            foreach ($h in $hashNotInXML.Keys) {
+            foreach ($h in $hashNotInCol.Keys) {
                 try {
                     Add-CMDeviceCollectionIncludeMembershipRule -CollectionName $ColName -IncludeCollectionName $hashNotInCol.Item($h)
                     Write-ToLog -File $LogFile -Message "$($ColName). Added include membership rule ($($hashNotInCol.Item($h)))"
@@ -455,7 +455,7 @@ function Reset-Collection ([string]$ColName, $ColXML) {
         }
 
         if ($hashNotInCol.Count -gt 0) {
-            foreach ($h in $hashNotInXML.Keys) {
+            foreach ($h in $hashNotInCol.Keys) {
                 try {
                     Add-CMDeviceCollectionExcludeMembershipRule -CollectionName $ColName -ExcludeCollectionName $hashNotInCol.Item($h)
                     Write-ToLog -File $LogFile -Message "$($ColName). Added exclude membership rule ($($hashNotInCol.Item($h)))"

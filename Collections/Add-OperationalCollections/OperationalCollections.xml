@@ -381,4 +381,82 @@ Each collection accepts the following fields:
         <exclude>Lenovo | ThinkPad X1 Carbon</exclude>
         <exclude>Lenovo | ThinkCentre M93</exclude>
     </collection>
+    <collection>
+        <name>SEC | BitLocker | Enabled</name>
+        <folderpath>Administrative\Security</folderpath>
+        <limiting>OS | Windows Workstation</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_ENCRYPTABLE_VOLUME on SMS_G_System_ENCRYPTABLE_VOLUME.ResourceId = SMS_R_System.ResourceId where SMS_G_System_ENCRYPTABLE_VOLUME.DriveLetter = "C:" and SMS_G_System_ENCRYPTABLE_VOLUME.ProtectionStatus = 1</query>
+    </collection>
+    <collection>
+        <name>SEC | BitLocker | Not Enabled</name>
+        <folderpath>Administrative\Security</folderpath>
+        <limiting>OS | Windows Workstation</limiting>
+        <include>OS | Windows Workstation</include>
+        <exclude>SEC | BitLocker | Enabled</exclude>
+    </collection>
+    <collection>
+        <name>SEC | Secure Boot | Enabled</name>
+        <folderpath>Administrative\Security</folderpath>
+        <limiting>OS | Windows Workstation</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_FIRMWARE on SMS_G_System_FIRMWARE.ResourceId = SMS_R_System.ResourceId where SMS_G_System_FIRMWARE.SecureBoot = 1</query>
+    </collection>
+    <collection>
+        <name>SEC | Secure Boot | Not Enabled</name>
+        <folderpath>Administrative\Security</folderpath>
+        <limiting>OS | Windows Workstation</limiting>
+        <include>OS | Windows Workstation</include>
+        <exclude>SEC | Secure Boot | Enabled</exclude>
+    </collection>
+    <collection>
+        <name>SEC | TPM | Activated</name>
+        <folderpath>Administrative\Security</folderpath>
+        <limiting>OS | Windows Workstation</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_TPM on SMS_G_System_TPM.ResourceId = SMS_R_System.ResourceId where SMS_G_System_TPM.IsActivated_InitialValue = 1</query>
+    </collection>
+    <collection>
+        <name>SEC | TPM | Not Activated</name>
+        <folderpath>Administrative\Security</folderpath>
+        <limiting>OS | Windows Workstation</limiting>
+        <include>OS | Windows Workstation</include>
+        <exclude>SEC | TPM | Activated</exclude>
+    </collection>
+    <collection>
+        <name>SEC | TPM | Enabled</name>
+        <folderpath>Administrative\Security</folderpath>
+        <limiting>OS | Windows Workstation</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_TPM on SMS_G_System_TPM.ResourceId = SMS_R_System.ResourceId where SMS_G_System_TPM.IsEnabled_InitialValue = 1</query>
+    </collection>
+    <collection>
+        <name>SEC | TPM | Not Enabled</name>
+        <folderpath>Administrative\Security</folderpath>
+        <limiting>OS | Windows Workstation</limiting>
+        <include>OS | Windows Workstation</include>
+        <exclude>SEC | TPM | Enabled</exclude>
+    </collection>
+    <collection>
+        <name>SEC | TPM | Owned</name>
+        <folderpath>Administrative\Security</folderpath>
+        <limiting>OS | Windows Workstation</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_TPM on SMS_G_System_TPM.ResourceId = SMS_R_System.ResourceId where SMS_G_System_TPM.IsOwned_InitialValue = 1</query>
+    </collection>
+    <collection>
+        <name>SEC | TPM | Not Owned</name>
+        <folderpath>Administrative\Security</folderpath>
+        <limiting>OS | Windows Workstation</limiting>
+        <include>OS | Windows Workstation</include>
+        <exclude>SEC | TPM | Owned</exclude>
+    </collection>
+    <collection>
+        <name>SEC | UEFI | Enabled</name>
+        <folderpath>Administrative\Security</folderpath>
+        <limiting>OS | Windows Workstation</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_FIRMWARE on SMS_G_System_FIRMWARE.ResourceId = SMS_R_System.ResourceId where SMS_G_System_FIRMWARE.UEFI = 1</query>
+    </collection>
+    <collection>
+        <name>SEC | UEFI | Not Enabled</name>
+        <folderpath>Administrative\Security</folderpath>
+        <limiting>OS | Windows Workstation</limiting>
+        <include>OS | Windows Workstation</include>
+        <exclude>SEC | UEFI | Enabled</exclude>
+    </collection>
 </collections>

@@ -89,6 +89,12 @@ Each collection accepts the following fields:
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Workstation 10.0%"</query>
     </collection>
     <collection>
+        <name>OS | Windows Workstation | Windows 10 | Insider Preview</name>
+        <folderpath>Administrative\Operating System</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_OPERATING_SYSTEM on SMS_G_System_OPERATING_SYSTEM.ResourceId = SMS_R_System.ResourceId where SMS_G_System_OPERATING_SYSTEM.Caption like "%Insider Preview"</query>
+    </collection>
+    <collection>
         <name>OS | Windows Workstation | Windows 10 | 1507 (build 10240)</name>
         <folderpath>Administrative\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
@@ -131,6 +137,12 @@ Each collection accepts the following fields:
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.17763"</query>
     </collection>
     <collection>
+        <name>OS | Windows Workstation | Windows 10 | 1903 (build 18362)</name>
+        <folderpath>Administrative\Operating System</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.18362"</query>
+    </collection>
+    <collection>
         <name>OS | Windows Workstation | Windows 10 | Other</name>
         <folderpath>Administrative\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
@@ -142,6 +154,8 @@ Each collection accepts the following fields:
         <exclude>OS | Windows Workstation | Windows 10 | 1709 (build 16299)</exclude>
         <exclude>OS | Windows Workstation | Windows 10 | 1803 (build 17134)</exclude>
         <exclude>OS | Windows Workstation | Windows 10 | 1809 (build 17763)</exclude>
+        <exclude>OS | Windows Workstation | Windows 10 | 1903 (build 18362)</exclude>
+        <exclude>OS | Windows Workstation | Windows 10 | Insider Preview</exclude>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Other</name>
@@ -291,19 +305,19 @@ Each collection accepts the following fields:
         <exclude>HW | VMware</exclude>
     </collection>
     <collection>
-        <name>Microsoft | Surface Pro 4</name>
+        <name>HW | Microsoft | Surface Pro 4</name>
         <folderpath>Administrative\Hardware Models\Models - Microsoft</folderpath>
         <limiting>HW | Microsoft</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "Microsoft Corporation" and SMS_G_System_COMPUTER_SYSTEM.Model like "Surface Pro 4%"</query>
     </collection>
     <collection>
-        <name>Microsoft | Surface Studio</name>
+        <name>HW | Microsoft | Surface Studio</name>
         <folderpath>Administrative\Hardware Models\Models - Microsoft</folderpath>
         <limiting>HW | Microsoft</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "Microsoft Corporation" and SMS_G_System_COMPUTER_SYSTEM.Model like "Surface Studio%"</query>
     </collection>
     <collection>
-        <name>Microsoft | Hyper-V VM</name>
+        <name>HW | Microsoft | Hyper-V VM</name>
         <folderpath>Administrative\Hardware Models\Models - Microsoft</folderpath>
         <limiting>HW | Microsoft</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "Microsoft Corporation" and SMS_G_System_COMPUTER_SYSTEM.Model = "Virtual Machine"</query>
@@ -314,18 +328,18 @@ Each collection accepts the following fields:
         <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
         <limiting>HW | Microsoft</limiting>
         <include>HW | Microsoft</include>
-        <exclude>Microsoft | Surface Pro 4</exclude>
-        <exclude>Microsoft | Surface Studio</exclude>
-        <exclude>Microsoft | Hyper-V VM</exclude>
+        <exclude>HW | Microsoft | Surface Pro 4</exclude>
+        <exclude>HW | Microsoft | Surface Studio</exclude>
+        <exclude>HW | Microsoft | Hyper-V VM</exclude>
     </collection>
     <collection>
-        <name>Dell | Latitude E7470</name>
+        <name>HW | Dell | Latitude E7470</name>
         <folderpath>Administrative\Hardware Models\Models - Dell</folderpath>
         <limiting>HW | Dell</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "Latitude E7470%"</query>
     </collection>
     <collection>
-        <name>Dell | Optiplex 7060</name>
+        <name>HW | Dell | Optiplex 7060</name>
         <folderpath>Administrative\Hardware Models\Models - Dell</folderpath>
         <limiting>HW | Dell</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "OptiPlex 7060%"</query>
@@ -336,17 +350,17 @@ Each collection accepts the following fields:
         <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
         <limiting>HW | Dell</limiting>
         <include>HW | Dell</include>
-        <exclude>Dell | Latitude E7470</exclude>
-        <exclude>Dell | Optiplex 7060</exclude>
+        <exclude>HW | Dell | Latitude E7470</exclude>
+        <exclude>HW | Dell | Optiplex 7060</exclude>
     </collection>
     <collection>
-        <name>HP | Compaq Elite 8300</name>
+        <name>HW | HP | Compaq Elite 8300</name>
         <folderpath>Administrative\Hardware Models\Models - HP</folderpath>
         <limiting>HW | HP</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "HP Compaq Elite 8300%"</query>
     </collection>
     <collection>
-        <name>HP | EliteDesk 800</name>
+        <name>HW | HP | EliteDesk 800</name>
         <folderpath>Administrative\Hardware Models\Models - HP</folderpath>
         <limiting>HW | HP</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "HP EliteDesk 800%"</query>
@@ -357,17 +371,17 @@ Each collection accepts the following fields:
         <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
         <limiting>HW | HP</limiting>
         <include>HW | HP</include>
-        <exclude>HP | Compaq Elite 8300</exclude>
-        <exclude>HP | EliteDesk 800</exclude>
+        <exclude>HW | HP | Compaq Elite 8300</exclude>
+        <exclude>HW | HP | EliteDesk 800</exclude>
     </collection>
     <collection>
-        <name>Lenovo | ThinkPad X1 Carbon</name>
+        <name>HW | Lenovo | ThinkPad X1 Carbon</name>
         <folderpath>Administrative\Hardware Models\Models - Lenovo</folderpath>
         <limiting>HW | Lenovo</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version like "ThinkPad X1 Carbon%"</query>
     </collection>
     <collection>
-        <name>Lenovo | ThinkCentre M93</name>
+        <name>HW | Lenovo | ThinkCentre M93</name>
         <folderpath>Administrative\Hardware Models\Models - Lenovo</folderpath>
         <limiting>HW | Lenovo</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version like "ThinkCentre M93%"</query>
@@ -378,8 +392,8 @@ Each collection accepts the following fields:
         <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
         <limiting>HW | Lenovo</limiting>
         <include>HW | Lenovo</include>
-        <exclude>Lenovo | ThinkPad X1 Carbon</exclude>
-        <exclude>Lenovo | ThinkCentre M93</exclude>
+        <exclude>HW | Lenovo | ThinkPad X1 Carbon</exclude>
+        <exclude>HW | Lenovo | ThinkCentre M93</exclude>
     </collection>
     <collection>
         <name>SEC | BitLocker | Enabled</name>

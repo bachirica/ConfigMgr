@@ -149,7 +149,6 @@ Each collection accepts the following fields:
         <exclude>OS | Windows Workstation | Windows 10 | 1803 (build 17134)</exclude>
         <exclude>OS | Windows Workstation | Windows 10 | 1809 (build 17763)</exclude>
         <exclude>OS | Windows Workstation | Windows 10 | 1903 (build 18362)</exclude>
-        <exclude>OS | Windows Workstation | Windows 10 | Insider Preview</exclude>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Other</name>

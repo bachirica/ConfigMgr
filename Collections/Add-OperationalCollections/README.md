@@ -1,6 +1,6 @@
 # Add-OperationalCollections
 
-Script to import and maintain the collections defined in an XML into SCCM. Each collection accepts the following fields in the XML definition:
+Script to import and maintain the collections defined in an XML into MEMCM/ConfigMgr. Each collection accepts the following fields in the XML definition:
 
 - **Name**: Mandatory
 - **Description**: Optional
@@ -11,6 +11,7 @@ Script to import and maintain the collections defined in an XML into SCCM. Each 
 - **Exclude**: Optional. Accepts multiple exclude memberhip rules per collection
 - **RecurCount**: Optional. Defaults to 7 if not specified (variable defined in the script)
 - **RecurInterval**: Optional. Values accepted Minutes, Hours, Days. Defaults to Days if not specified (variable defined in the script)
+- **RefreshType**: Optional. Values accepted None, Manual, Periodic, Continuous, Both. Defaults to Periodic if not specified (variable defined in the script)
 
 ## Usage
 ```

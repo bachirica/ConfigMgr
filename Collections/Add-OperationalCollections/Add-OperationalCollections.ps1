@@ -3,7 +3,7 @@
     Create ConfigMgr operational collections based on a XML definition file
 
 .DESCRIPTION
-    Creates ConfigMgr collections imported from an XML file
+    Creates and maintains ConfigMgr collections imported from an XML file
     See XML file for additional definition information
 
 .PARAMETER SiteServer
@@ -20,9 +20,15 @@
 
 .NOTES
     Author: Bernardo Achirica (@bachirica)
-    Version: 2.0
-    Date: 2019.01.16
+    Version: 2.1
+    Date: 2019.12.31
     References: Idea based on Mark Allen's script (https://github.com/markhallen/configmgr/tree/master/New-CMOperationalCollections)
+
+    Version History:
+    1.0 - 2019.01.11: Initial release
+    2.0 - 2019.01.17: Added Maintain parameter to correct collections that deviate from the XML definition
+    2.1 - 2019.12.31: Added the option to handle RefreshType in the XML definition
+                      Consolidate logging lines under INFO, WARN, ERROR
 
 .EXAMPLE
     .\Add-OperationalCollections.ps1 -SiteServer mysccmserver.mydomain.local -SiteCode PR1 -CollectionsXML .\OperationalCollections.xml
@@ -70,12 +76,13 @@ param(
 # Default values used for some parameters if they're not specified in the XML
 [int]$DefaultRecurCount = 7
 [string]$DefaultRecurInterval = "Days"
+[string]$DefaultRefreshType = "Periodic"
 [string]$DefaultDescription = "Operational Collection"
 
 # $SchedAddHours adds some extra hours to the collection evaluation schedule
 # If a collection refreshes every 7 days, it'll do it always at the same time the collection was created (probably during office hours)
 # Adding a few hours can allow you to schedule those refresh cycles outside office hours
-[int]$SchedAddHours = 6 
+[int]$SchedAddHours = 0
 
 # Log file location definition
 [string]$ScriptName = $($((Split-Path -Path $MyInvocation.MyCommand.Definition -Leaf)).Replace(".ps1",""))
@@ -152,7 +159,7 @@ Function Add-FolderPath ([string]$RootFolder, [string]$Path) {
     } else {
         New-Item -Path $RootFolder -Name $Path -ItemType Directory
     }
-    Write-ToLog -File $LogFile -Message "Created collection folder $($FolderPath)"
+    Write-ToLog -File $LogFile -Message "INFO: Created collection folder $($FolderPath)"
 }
 
 function Get-DefaultIfNull ([string]$XMLValue, [string]$Default) {
@@ -163,24 +170,24 @@ function Get-DefaultIfNull ([string]$XMLValue, [string]$Default) {
     }
 }
 
-Function Add-Collection ([string]$ColName, [string]$ColLimiting, [string]$ColDescription, [string]$ColRecurInterval, [int]$ColRecurCount) {
+Function Add-Collection ([string]$ColName, [string]$ColLimiting, [string]$ColDescription, [string]$ColRecurInterval, [int]$ColRecurCount, [string]$ColRefreshType) {
     $Schedule = New-CMSchedule -RecurInterval $ColRecurInterval -RecurCount $ColRecurCount -Start (Get-Date).AddHours($SchedAddHours)
     try {
-        New-CMDeviceCollection -Name $ColName -LimitingCollectionName $ColLimiting -Comment $ColDescription -RefreshSchedule $Schedule -RefreshType 2 | Out-Null
-        Write-ToLog -File $LogFile -Message "$($ColName). Collection created"
+        New-CMDeviceCollection -Name $ColName -LimitingCollectionName $ColLimiting -Comment $ColDescription -RefreshSchedule $Schedule -RefreshType $ColRefreshType | Out-Null
+        Write-ToLog -File $LogFile -Message "INFO: $($ColName). Collection created"
     }
     catch {
-        Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Error creating collection. Error message: $($_.Exception.Message)"
+        Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Error creating collection. Error message: $($_.Exception.Message)"
     }
 }
 
 Function Add-CollectionQuery ([string]$ColName, [string]$Query) {
     try {
         Add-CMDeviceCollectionQueryMembershipRule -CollectionName $ColName -RuleName $ColName -QueryExpression $Query
-        Write-ToLog -File $LogFile -Message "$($ColName). Added collection membership query to collection"
+        Write-ToLog -File $LogFile -Message "INFO: $($ColName). Added collection membership query to collection"
     }
     catch {
-        Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not add collection membership query. Error message: $($_.Exception.Message)"
+        Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not add collection membership query. Error message: $($_.Exception.Message)"
     }
 }
 
@@ -188,13 +195,13 @@ Function Add-CollectionInclude ([string]$ColName, [string]$Include) {
     if ((Get-CMDeviceCollection -Name $ColName).Name -eq $ColName) {
         try {
             Add-CMDeviceCollectionIncludeMembershipRule -CollectionName $ColName -IncludeCollectionName $Include
-            Write-ToLog -File $LogFile -Message "$($ColName). Added include membership rule"
+            Write-ToLog -File $LogFile -Message "INFO: $($ColName). Added include membership rule"
         }
         catch {
-            Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not add include membership rule. Error message: $($_.Exception.Message)"
+            Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not add include membership rule. Error message: $($_.Exception.Message)"
         }
     } else {
-        Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Include membership collection $($Include) doesn't exist"
+        Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Include membership collection $($Include) doesn't exist"
     }
 }
 
@@ -202,13 +209,13 @@ Function Add-CollectionExclude ([string]$ColName, [string]$Exclude) {
     if ((Get-CMDeviceCollection -Name $ColName).Name -eq $ColName) {
         try {
             Add-CMDeviceCollectionExcludeMembershipRule -CollectionName $ColName -ExcludeCollectionName $Exclude
-            Write-ToLog -File $LogFile -Message "$($ColName). Added exclude membership rule"
+            Write-ToLog -File $LogFile -Message "INFO: $($ColName). Added exclude membership rule"
         }
         catch {
-            Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not add exclude membership rule. Error message: $($_.Exception.Message)"
+            Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not add exclude membership rule. Error message: $($_.Exception.Message)"
         }
     } else {
-        Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Exclude membership collection $($Exclude) doesn't exist"
+        Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Exclude membership collection $($Exclude) doesn't exist"
     }
 }
 
@@ -235,10 +242,10 @@ function Reset-Collection ([string]$ColName, $ColXML) {
     if ($CMCol.LimitToCollectionName -ne $ColXML.limiting) {
         try {
             Set-CMCollection -InputObject $CMCol -LimitingCollectionName $ColXML.limiting
-            Write-ToLog -File $LogFile -Message "$($ColName). Corrected limiting collection to $($ColXML.limiting)"
+            Write-ToLog -File $LogFile -Message "WARN: $($ColName). Corrected limiting collection to $($ColXML.limiting)"
         }
         catch {
-            Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not correct limiting collection to $($ColXML.limiting). Error message: $($_.Exception.Message)"
+            Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not correct limiting collection to $($ColXML.limiting). Error message: $($_.Exception.Message)"
         }
     }
 
@@ -248,21 +255,32 @@ function Reset-Collection ([string]$ColName, $ColXML) {
     if ($CMCol.Comment -ne $ColDescription) {
         try {
             Set-CMCollection -InputObject $CMCol -Comment $ColDescription
-            Write-ToLog -File $LogFile -Message "$($ColName). Corrected collection comment"
+            Write-ToLog -File $LogFile -Message "WARN: $($ColName). Corrected collection comment"
         }
         catch {
-            Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not correct collection comment. Error message: $($_.Exception.Message)"
+            Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not correct collection comment. Error message: $($_.Exception.Message)"
         }
     }
 
     # Check refresh type
-    if ($CMCol.RefreshType -ne 2) {
+    $ColRefreshType = Get-DefaultIfNull -XMLValue $col.refreshtype -Default $DefaultRefreshType
+
+    switch ($ColRefreshType) {
+        "None" { $intRefreshType = 0 }
+        "Manual" { $intRefreshType = 1 }
+        "Periodic" { $intRefreshType = 2 }
+        "Continuous" { $intRefreshType = 4 }
+        "Both" { $intRefreshType = 6 }
+        #Default { $intRefreshType = 2 }
+    }
+
+    if ($CMCol.RefreshType -ne $intRefreshType) {
         try {
-            Set-CMCollection -InputObject $CMCol -RefreshType 2
-            Write-ToLog -File $LogFile -Message "$($ColName). Corrected refresh type"
+            Set-CMCollection -InputObject $CMCol -RefreshType $ColRefreshType
+            Write-ToLog -File $LogFile -Message "WARN: $($ColName). Corrected refresh type to $($ColRefreshType)"
         }
         catch {
-            Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not correct refresh type. Error message: $($_.Exception.Message)"
+            Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not correct refresh type. Error message: $($_.Exception.Message)"
         }
     }
 
@@ -294,10 +312,10 @@ function Reset-Collection ([string]$ColName, $ColXML) {
 
         try {
             Set-CMCollection -InputObject $CMCol -RefreshSchedule $Schedule
-            Write-ToLog -File $LogFile -Message "$($ColName). Corrected refresh schedule"
+            Write-ToLog -File $LogFile -Message "WARN: $($ColName). Corrected refresh schedule"
         }
         catch {
-            Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not correct refresh schedule. Error message: $($_.Exception.Message)"
+            Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not correct refresh schedule. Error message: $($_.Exception.Message)"
         }
     }
 
@@ -307,10 +325,10 @@ function Reset-Collection ([string]$ColName, $ColXML) {
     if ($ColDirects.Count -gt 0) {
         try {
             Get-CMDeviceCollectionDirectMembershipRule -CollectionName $ColName | ForEach-Object {Remove-CMDeviceCollectionDirectMembershipRule -CollectionName $ColName -ResourceId $_.ResourceID -Force}
-            Write-ToLog -File $LogFile -Message "$($ColName). Removed direct membership rules"
+            Write-ToLog -File $LogFile -Message "WARN: $($ColName). Removed direct membership rules"
         }
         catch {
-            Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not remove direct membership rules. Error message: $($_.Exception.Message)"
+            Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not remove direct membership rules. Error message: $($_.Exception.Message)"
         }
     }
     
@@ -344,10 +362,10 @@ function Reset-Collection ([string]$ColName, $ColXML) {
             foreach ($h in $hashNotInXML.Keys) {
                 try {
                     Remove-CMDeviceCollectionQueryMembershipRule -CollectionName $ColName -RuleName $h -Force
-                    Write-ToLog -File $LogFile -Message "$($ColName). Removed query membership rule"
+                    Write-ToLog -File $LogFile -Message "WARN: $($ColName). Removed query membership rule"
                 }
                 catch {
-                    Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not remove query membership rule. Error message: $($_.Exception.Message)"
+                    Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not remove query membership rule. Error message: $($_.Exception.Message)"
                 }
             }
         }
@@ -356,10 +374,10 @@ function Reset-Collection ([string]$ColName, $ColXML) {
             foreach ($h in $hashNotInCol.Keys) {
                 try {
                     Add-CMDeviceCollectionQueryMembershipRule -CollectionName $ColName -RuleName $ColName -QueryExpression "$($hashNotInCol.Item($h))"
-                    Write-ToLog -File $LogFile -Message "$($ColName). Added query membership rule"
+                    Write-ToLog -File $LogFile -Message "WARN: $($ColName). Added query membership rule"
                 }
                 catch {
-                    Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not add query membership rule. Error message: $($_.Exception.Message)"
+                    Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not add query membership rule. Error message: $($_.Exception.Message)"
                 }
             }
         }
@@ -395,10 +413,10 @@ function Reset-Collection ([string]$ColName, $ColXML) {
             foreach ($h in $hashNotInXML.Keys) {
                 try {
                     Remove-CMDeviceCollectionIncludeMembershipRule -CollectionName $ColName -IncludeCollectionName $hashNotInXML.Item($h) -Force
-                    Write-ToLog -File $LogFile -Message "$($ColName). Removed include membership rule ($($hashNotInXML.Item($h)))"
+                    Write-ToLog -File $LogFile -Message "WARN: $($ColName). Removed include membership rule ($($hashNotInXML.Item($h)))"
                 }
                 catch {
-                    Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not remove include membership rule ($($hashNotInXML.Item($h))). Error message: $($_.Exception.Message)"
+                    Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not remove include membership rule ($($hashNotInXML.Item($h))). Error message: $($_.Exception.Message)"
                 }
             }
         }
@@ -407,10 +425,10 @@ function Reset-Collection ([string]$ColName, $ColXML) {
             foreach ($h in $hashNotInCol.Keys) {
                 try {
                     Add-CMDeviceCollectionIncludeMembershipRule -CollectionName $ColName -IncludeCollectionName $hashNotInCol.Item($h)
-                    Write-ToLog -File $LogFile -Message "$($ColName). Added include membership rule ($($hashNotInCol.Item($h)))"
+                    Write-ToLog -File $LogFile -Message "WARN: $($ColName). Added include membership rule ($($hashNotInCol.Item($h)))"
                 }
                 catch {
-                    Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not add include membership rule ($($hashNotInCol.Item($h))). Error message: $($_.Exception.Message)"
+                    Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not add include membership rule ($($hashNotInCol.Item($h))). Error message: $($_.Exception.Message)"
                 }
             }
         }
@@ -446,10 +464,10 @@ function Reset-Collection ([string]$ColName, $ColXML) {
             foreach ($h in $hashNotInXML.Keys) {
                 try {
                     Remove-CMDeviceCollectionExcludeMembershipRule -CollectionName $ColName -ExcludeCollectionName $hashNotInXML.Item($h) -Force
-                    Write-ToLog -File $LogFile -Message "$($ColName). Removed exclude membership rule ($($hashNotInXML.Item($h)))"
+                    Write-ToLog -File $LogFile -Message "WARN: $($ColName). Removed exclude membership rule ($($hashNotInXML.Item($h)))"
                 }
                 catch {
-                    Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not remove exclude membership rule ($($hashNotInXML.Item($h))). Error message: $($_.Exception.Message)"
+                    Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not remove exclude membership rule ($($hashNotInXML.Item($h))). Error message: $($_.Exception.Message)"
                 }
             }
         }
@@ -458,10 +476,10 @@ function Reset-Collection ([string]$ColName, $ColXML) {
             foreach ($h in $hashNotInCol.Keys) {
                 try {
                     Add-CMDeviceCollectionExcludeMembershipRule -CollectionName $ColName -ExcludeCollectionName $hashNotInCol.Item($h)
-                    Write-ToLog -File $LogFile -Message "$($ColName). Added exclude membership rule ($($hashNotInCol.Item($h)))"
+                    Write-ToLog -File $LogFile -Message "WARN: $($ColName). Added exclude membership rule ($($hashNotInCol.Item($h)))"
                 }
                 catch {
-                    Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Could not add exclude membership rule ($($hashNotInCol.Item($h))). Error message: $($_.Exception.Message)"
+                    Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Could not add exclude membership rule ($($hashNotInCol.Item($h))). Error message: $($_.Exception.Message)"
                 }
             }
         }
@@ -487,11 +505,11 @@ foreach ($col in $OpCollections.Collections.Collection) {
     # Check if collection already exist
     if ((Get-CMDeviceCollection -Name $ColName).Name -eq $ColName) {
         if ($Maintain) {
-            Write-ToLog -File $LogFile -Message "$($ColName). Collection already exist. Maintenance enabled"
+            #Write-ToLog -File $LogFile -Message "INFO: $($ColName). Collection already exist. Maintenance enabled"
             Reset-Collection -ColName $ColName -ColXML $col
             continue
         } else {
-            Write-ToLog -File $LogFile -Message "$($ColName). Collection already exist. Skipping, maintenance not enabled"
+            Write-ToLog -File $LogFile -Message "INFO: $($ColName). Collection already exist. Skipping, maintenance not enabled"
             continue
         }
     } else {
@@ -508,20 +526,21 @@ foreach ($col in $OpCollections.Collections.Collection) {
         if ($null -ne $col.limiting) {
             $ColLimiting = $col.limiting
             if ($null -eq (Get-CMDeviceCollection -Name $ColLimiting).Name) {
-                Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Limiting collection does not exist"
+                Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Limiting collection does not exist"
                 continue
             }
         } else {
-            Write-ToLog -File $LogFile -Message "ERROR. $($ColName). Limiting collection is missing in XML"
+            Write-ToLog -File $LogFile -Message "ERROR: $($ColName). Limiting collection is missing in XML"
             continue
         }
 
         $ColDescription = Get-DefaultIfNull -XMLValue $col.description -Default $DefaultDescription
         $ColRecurCount = Get-DefaultIfNull -XMLValue $col.recurcount -Default $DefaultRecurCount
         $ColRecurInterval = Get-DefaultIfNull -XMLValue $col.recurinterval -Default $DefaultRecurInterval
+        $ColRefreshType = Get-DefaultIfNull -XMLValue $col.refreshtype -Default $DefaultRefreshType
 
         # Create the empty collection
-        Add-Collection -ColName $ColName -ColLimiting $ColLimiting -ColDescription $ColDescription -ColRecurInterval $ColRecurInterval -ColRecurCount $ColRecurCount
+        Add-Collection -ColName $ColName -ColLimiting $ColLimiting -ColDescription $ColDescription -ColRecurInterval $ColRecurInterval -ColRecurCount $ColRecurCount -ColRefreshType $ColRefreshType
 
         # Move the collection to their corresponding folder
         Move-CMObject -FolderPath $FolderPath -InputObject (Get-CMDeviceCollection -Name $ColName)

@@ -10,6 +10,7 @@ Each collection accepts the following fields:
     - Exclude: Optional. Accepts multiple exclude memberhip rules per collection
     - RecurCount: Optional. Defaults to 7 if not specified (variable defined in the script)
     - RecurInterval: Optional. Values accepted Minutes, Hours, Days. Defaults to Days if not specified (variable defined in the script)
+    - RefreshType: Optional. Values accepted None, Manual, Periodic, Continuous, Both. Defaults to Periodic if not specified (variable defined in the script)
 -->
     <collection>
         <name>All Systems | With Client</name>
@@ -19,6 +20,7 @@ Each collection accepts the following fields:
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Client = "1"</query>
         <recurcount>1</recurcount>
         <recurinterval>Days</recurinterval>
+        <refreshtype>Both</refreshtype>
     </collection>
     <collection>
         <name>All Systems | Without Client</name>
@@ -46,20 +48,20 @@ Each collection accepts the following fields:
     <collection>
         <name>OS | Windows Workstation</name>
         <folderpath>Administrative\Operating System</folderpath>
-        <limiting>All Systems</limiting>
+        <limiting>All Systems | With Client</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Workstation%"</query>
     </collection>
     <collection>
         <name>OS | Windows Server</name>
         <folderpath>Administrative\Operating System</folderpath>
-        <limiting>All Systems</limiting>
+        <limiting>All Systems | With Client</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Server%" or SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Advanced Server%"</query>
     </collection>
     <collection>
         <name>OS | Other</name>
         <folderpath>Administrative\Operating System</folderpath>
-        <limiting>All Systems</limiting>
-        <include>All Systems</include>
+        <limiting>All Systems | With Client</limiting>
+        <include>All Systems | With Client</include>
         <exclude>OS | Windows Workstation</exclude>
         <exclude>OS | Windows Server</exclude>
         <exclude>All Unknown Computers</exclude>
@@ -137,6 +139,12 @@ Each collection accepts the following fields:
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.18362"</query>
     </collection>
     <collection>
+        <name>OS | Windows Workstation | Windows 10 | 1909 (build 18363)</name>
+        <folderpath>1. Operational\Operating System</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.18363"</query>
+    </collection>
+    <collection>
         <name>OS | Windows Workstation | Windows 10 | Other</name>
         <folderpath>Administrative\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
@@ -149,6 +157,7 @@ Each collection accepts the following fields:
         <exclude>OS | Windows Workstation | Windows 10 | 1803 (build 17134)</exclude>
         <exclude>OS | Windows Workstation | Windows 10 | 1809 (build 17763)</exclude>
         <exclude>OS | Windows Workstation | Windows 10 | 1903 (build 18362)</exclude>
+        <exclude>OS | Windows Workstation | Windows 10 | 1909 (build 18363)</exclude>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Other</name>
@@ -231,30 +240,55 @@ Each collection accepts the following fields:
         <exclude>WaaS | Windows 10 Long Term Servicing Branch (LTSB)</exclude>
     </collection>
     <collection>
-        <name>Chassis | Laptop</name>
-        <folderpath>Administrative\Chassis Types</folderpath>
+        <name>O365 | Office 365 Installed</name>
+        <folderpath>1. Operational\Office 365</folderpath>
+        <limiting>All Systems | With Client (Active)</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_ADD_REMOVE_PROGRAMS_64 on SMS_G_System_ADD_REMOVE_PROGRAMS_64.ResourceID = SMS_R_System.ResourceId inner join SMS_G_System_Office365ProPlusConfigurations on SMS_G_System_Office365ProPlusConfigurations.ResourceId = SMS_R_System.ResourceId where SMS_G_System_Office365ProPlusConfigurations.VersionToReport is not null</query>
+    </collection>
+    <collection>
+        <name>O365 | Managed Systems</name>
+        <folderpath>1. Operational\Office 365</folderpath>
+        <limiting>O365 | Office 365 Installed</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS on SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS.CCMManaged = "UpdateNotify Object"</query>
+    </collection>
+    <collection>
+        <name>O365 | NOT Managed Systems</name>
+        <folderpath>1. Operational\Office 365</folderpath>
+        <limiting>O365 | Office 365 Installed</limiting>
+        <include>O365 | Office 365 Installed</include>
+        <exclude>O365 | Managed Systems</exclude>
+    </collection>
+    <collection>
+        <name>App | ConfigMgr Console</name>
+        <folderpath>1. Operational\Applications</folderpath>
+        <limiting>All Systems | With Client (Active)</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_ADD_REMOVE_PROGRAMS on SMS_G_System_ADD_REMOVE_PROGRAMS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_ADD_REMOVE_PROGRAMS.DisplayName = "System Center Configuration Manager Console"</query>
+    </collection>
+    <collection>
+        <name>Chassis | Virtual</name>
+        <folderpath>1. Operational\Chassis Types</folderpath>
         <limiting>All Systems | With Client</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceId = SMS_R_System.ResourceId where SMS_R_System.IsVirtualMachine = "True" or SMS_G_System_COMPUTER_SYSTEM.Model = "Virtual Machine" or SMS_G_System_COMPUTER_SYSTEM.Model = "VMware Virtual Platform"</query>
+    </collection>
+    <collection>
+        <name>Chassis | Physical</name>
+        <folderpath>1. Operational\Chassis Types</folderpath>
+        <limiting>All Systems | With Client</limiting>
+        <include>All Systems | With Client</include>
+        <exclude>Chassis | Virtual</exclude>
+    </collection>
+    <collection>
+        <name>Chassis | Physical | Laptop</name>
+        <folderpath>1. Operational\Chassis Types</folderpath>
+        <limiting>Chassis | Physical</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_SYSTEM_ENCLOSURE on SMS_G_System_SYSTEM_ENCLOSURE.ResourceId = SMS_R_System.ResourceId where SMS_G_System_SYSTEM_ENCLOSURE.ChassisTypes in ("8","9","10","11","14")</query>
     </collection>
     <collection>
-        <name>Chassis | Desktop</name>
-        <folderpath>Administrative\Chassis Types</folderpath>
-        <limiting>All Systems | With Client</limiting>
-        <include>All Systems | With Client</include>
-        <exclude>Chassis | Laptop</exclude>
-    </collection>
-    <collection>
-        <name>Chassis | Desktop | Virtual</name>
-        <folderpath>Administrative\Chassis Types</folderpath>
-        <limiting>Chassis | Desktop</limiting>
-        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.IsVirtualMachine = "True"</query>
-    </collection>
-    <collection>
-        <name>Chassis | Desktop | Physical</name>
-        <folderpath>Administrative\Chassis Types</folderpath>
-        <limiting>Chassis | Desktop</limiting>
-        <include>Chassis | Desktop</include>
-        <exclude>Chassis | Desktop | Virtual</exclude>
+        <name>Chassis | Physical | Desktop</name>
+        <folderpath>1. Operational\Chassis Types</folderpath>
+        <limiting>Chassis | Physical</limiting>
+        <include>Chassis | Physical</include>
+        <exclude>Chassis | Physical | Laptop</exclude>
     </collection>
     <collection>
         <name>HW | Dell</name>
@@ -304,6 +338,12 @@ Each collection accepts the following fields:
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "Microsoft Corporation" and SMS_G_System_COMPUTER_SYSTEM.Model like "Surface Pro 4%"</query>
     </collection>
     <collection>
+        <name>HW | Microsoft | Surface Pro 6</name>
+        <folderpath>1. Operational\Hardware Models\Models - Microsoft</folderpath>
+        <limiting>HW | Microsoft</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "Microsoft Corporation" and SMS_G_System_COMPUTER_SYSTEM.Model like "Surface Pro 6%"</query>
+    </collection>
+    <collection>
         <name>HW | Microsoft | Surface Studio</name>
         <folderpath>Administrative\Hardware Models\Models - Microsoft</folderpath>
         <limiting>HW | Microsoft</limiting>
@@ -322,71 +362,576 @@ Each collection accepts the following fields:
         <limiting>HW | Microsoft</limiting>
         <include>HW | Microsoft</include>
         <exclude>HW | Microsoft | Surface Pro 4</exclude>
+        <exclude>HW | Microsoft | Surface Pro 6</exclude>
         <exclude>HW | Microsoft | Surface Studio</exclude>
         <exclude>HW | Microsoft | Hyper-V VM</exclude>
     </collection>
     <collection>
-        <name>HW | Dell | Latitude E7470</name>
-        <folderpath>Administrative\Hardware Models\Models - Dell</folderpath>
+        <name>HW | Dell | Inspiron 5523</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
         <limiting>HW | Dell</limiting>
-        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "Latitude E7470%"</query>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Inspiron 5523"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude 7280</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude 7280"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude 7370</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude 7370"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude 7380</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude 7380"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude 7390</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude 7390"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude 7400</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude 7400"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude 7480</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude 7480"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude 7490</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude 7490"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E4310</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E4310"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E5440</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E5440"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E5550</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E5550"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E6220</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E6220"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E6320</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E6320"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E6330</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E6330"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E6430</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E6430"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E7240</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E7240"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E7250</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E7250"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E7270</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E7270"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E7440</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E7440"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E7450</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E7450"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude E7470</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude E7470"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Optiplex 7040</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "OptiPlex 7040"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Optiplex 7050</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "OptiPlex 7050"</query>
     </collection>
     <collection>
         <name>HW | Dell | Optiplex 7060</name>
-        <folderpath>Administrative\Hardware Models\Models - Dell</folderpath>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
         <limiting>HW | Dell</limiting>
-        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "OptiPlex 7060%"</query>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "OptiPlex 7060"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Optiplex 780</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "OptiPlex 780"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Optiplex 790</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "OptiPlex 790"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Optiplex 9010</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "OptiPlex 9010"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Optiplex 9020</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "OptiPlex 9020"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Optiplex 960</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "OptiPlex 960"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Optiplex 980</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "OptiPlex 980"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Optiplex 990</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "OptiPlex 990"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Precision 3520</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Precision 3520"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Precision Workstation 690</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Precision WorkStation 690"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | XPS 13 9360</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "XPS 13 9360"</query>
     </collection>
     <collection>
         <name>HW | Dell | Unclassified</name>
         <description>Contains all Dell hardware not included in model specific collections</description>
-        <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
+        <folderpath>1. Operational\Hardware Models\Manufacturers</folderpath>
         <limiting>HW | Dell</limiting>
         <include>HW | Dell</include>
+        <exclude>HW | Dell | Inspiron 5523</exclude>
+        <exclude>HW | Dell | Latitude 7280</exclude>
+        <exclude>HW | Dell | Latitude 7370</exclude>
+        <exclude>HW | Dell | Latitude 7380</exclude>
+        <exclude>HW | Dell | Latitude 7390</exclude>
+        <exclude>HW | Dell | Latitude 7400</exclude>
+        <exclude>HW | Dell | Latitude 7480</exclude>
+        <exclude>HW | Dell | Latitude 7490</exclude>
+        <exclude>HW | Dell | Latitude E4310</exclude>
+        <exclude>HW | Dell | Latitude E5440</exclude>
+        <exclude>HW | Dell | Latitude E5550</exclude>
+        <exclude>HW | Dell | Latitude E6220</exclude>
+        <exclude>HW | Dell | Latitude E6320</exclude>
+        <exclude>HW | Dell | Latitude E6330</exclude>
+        <exclude>HW | Dell | Latitude E6430</exclude>
+        <exclude>HW | Dell | Latitude E7240</exclude>
+        <exclude>HW | Dell | Latitude E7250</exclude>
+        <exclude>HW | Dell | Latitude E7270</exclude>
+        <exclude>HW | Dell | Latitude E7440</exclude>
+        <exclude>HW | Dell | Latitude E7450</exclude>
         <exclude>HW | Dell | Latitude E7470</exclude>
+        <exclude>HW | Dell | Optiplex 7040</exclude>
+        <exclude>HW | Dell | Optiplex 7050</exclude>
         <exclude>HW | Dell | Optiplex 7060</exclude>
+        <exclude>HW | Dell | Optiplex 780</exclude>
+        <exclude>HW | Dell | Optiplex 790</exclude>
+        <exclude>HW | Dell | Optiplex 9010</exclude>
+        <exclude>HW | Dell | Optiplex 9020</exclude>
+        <exclude>HW | Dell | Optiplex 960</exclude>
+        <exclude>HW | Dell | Optiplex 980</exclude>
+        <exclude>HW | Dell | Optiplex 990</exclude>
+        <exclude>HW | Dell | Precision 3520</exclude>
+        <exclude>HW | Dell | Precision Workstation 690</exclude>
+        <exclude>HW | Dell | XPS 13 9360</exclude>
+    </collection>
+    <collection>
+        <name>HW | HP | Compaq Elite 8200</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "HP Compaq Elite 8200%" or SMS_G_System_COMPUTER_SYSTEM.Model like "HP Compaq 8200 Elite%"</query>
     </collection>
     <collection>
         <name>HW | HP | Compaq Elite 8300</name>
-        <folderpath>Administrative\Hardware Models\Models - HP</folderpath>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
         <limiting>HW | HP</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "HP Compaq Elite 8300%"</query>
     </collection>
     <collection>
         <name>HW | HP | EliteDesk 800</name>
-        <folderpath>Administrative\Hardware Models\Models - HP</folderpath>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
         <limiting>HW | HP</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "HP EliteDesk 800%"</query>
     </collection>
     <collection>
+        <name>HW | HP | EliteDesk 800 | G1</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP | EliteDesk 800</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "HP EliteDesk 800 G1%"</query>
+    </collection>
+    <collection>
+        <name>HW | HP | EliteDesk 800 | G2</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP | EliteDesk 800</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "HP EliteDesk 800 G2%"</query>
+    </collection>
+    <collection>
+        <name>HW | HP | EliteDesk 800 | G3</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP | EliteDesk 800</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "HP EliteDesk 800 G3%"</query>
+    </collection>
+    <collection>
+        <name>HW | HP | EliteDesk 800 | G4</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP | EliteDesk 800</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "HP EliteDesk 800 G4%"</query>
+    </collection>
+    <collection>
+        <name>HW | HP | ProDesk 800</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "HP ProDesk 800%"</query>
+    </collection>
+    <collection>
+        <name>HW | HP | ProDesk 800 | G3</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP | ProDesk 800</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "HP ProDesk 800 G3%"</query>
+    </collection>
+    <collection>
+        <name>HW | HP | ProLiant DL380p</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "ProLiant DL380p%"</query>
+    </collection>
+    <collection>
+        <name>HW | HP | ProLiant DL380p | G8</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP | ProLiant DL380p</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "ProLiant DL380p Gen8%"</query>
+    </collection>
+    <collection>
+        <name>HW | HP | Z4 Workstation</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model like "HP Z4%"</query>
+    </collection>
+    <collection>
+        <name>HW | HP | Z4 Workstation | G4</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP | Z4 Workstation</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "HP Z4 G4 Workstation"</query>
+    </collection>
+    <collection>
+        <name>HW | HP | Z800 Workstation</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "HP Z800 Workstation"</query>
+    </collection>
+    <collection>
+        <name>HW | HP | Z820 Workstation</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "HP Z820 Workstation"</query>
+    </collection>
+    <collection>
+        <name>HW | HP | Z840 Workstation</name>
+        <folderpath>1. Operational\Hardware Models\Models - HP</folderpath>
+        <limiting>HW | HP</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "HP Z840 Workstation"</query>
+    </collection>
+    <collection>
         <name>HW | HP | Unclassified</name>
         <description>Contains all HP hardware not included in model specific collections</description>
-        <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
+        <folderpath>1. Operational\Hardware Models\Manufacturers</folderpath>
         <limiting>HW | HP</limiting>
         <include>HW | HP</include>
+        <exclude>HW | HP | Compaq Elite 8200</exclude>
         <exclude>HW | HP | Compaq Elite 8300</exclude>
         <exclude>HW | HP | EliteDesk 800</exclude>
+        <exclude>HW | HP | ProDesk 800</exclude>
+        <exclude>HW | HP | ProLiant DL380p</exclude>
+        <exclude>HW | HP | Z4 Workstation</exclude>
+        <exclude>HW | HP | Z800 Workstation</exclude>
+        <exclude>HW | HP | Z820 Workstation</exclude>
+        <exclude>HW | HP | Z840 Workstation</exclude>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | IdeaPad 320</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version like "Lenovo ideapad 320%"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkCentre M57p</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkCentre M57p"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkCentre M900</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkCentre M900"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkCentre M910q</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkCentre M910q"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkCentre M900z</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkCentre M900z"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkCentre M90p</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkCentre M90p"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkCentre M90z</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkCentre M90z"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkCentre M91p</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkCentre M91p"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkCentre M92z</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkCentre M92z"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkCentre M93p</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkCentre M93p"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkCentre M93z</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkCentre M93z"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad Helix</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad Helix"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad T430</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad T430"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad T430s</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad T430s"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad T560</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad T560"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad T61</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad T61"</query>
     </collection>
     <collection>
         <name>HW | Lenovo | ThinkPad X1 Carbon</name>
-        <folderpath>Administrative\Hardware Models\Models - Lenovo</folderpath>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
         <limiting>HW | Lenovo</limiting>
-        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version like "ThinkPad X1 Carbon%"</query>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad X1 Carbon"</query>
     </collection>
     <collection>
-        <name>HW | Lenovo | ThinkCentre M93</name>
-        <folderpath>Administrative\Hardware Models\Models - Lenovo</folderpath>
+        <name>HW | Lenovo | ThinkPad X1 Carbon 3rd</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
         <limiting>HW | Lenovo</limiting>
-        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version like "ThinkCentre M93%"</query>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad X1 Carbon 3rd"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad X1 Carbon 5th</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad X1 Carbon 5th"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad X1 Carbon 6th</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad X1 Carbon 6th"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad X240</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad X240"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad X250</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad X250"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad X260</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad X260"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad X270</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad X270"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad X280</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad X280"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad X390</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad X390"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkStation D30</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkStation D30"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkStation P310</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkStation P310"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkStation P720</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkStation P720"</query>
     </collection>
     <collection>
         <name>HW | Lenovo | Unclassified</name>
         <description>Contains all Lenovo hardware not included in model specific collections</description>
-        <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
+        <folderpath>1. Operational\Hardware Models\Manufacturers</folderpath>
         <limiting>HW | Lenovo</limiting>
         <include>HW | Lenovo</include>
+        <exclude>HW | Lenovo | IdeaPad 320</exclude>
+        <exclude>HW | Lenovo | ThinkCentre M57p</exclude>
+        <exclude>HW | Lenovo | ThinkCentre M900</exclude>
+        <exclude>HW | Lenovo | ThinkCentre M900z</exclude>
+        <exclude>HW | Lenovo | ThinkCentre M90p</exclude>
+        <exclude>HW | Lenovo | ThinkCentre M90z</exclude>
+        <exclude>HW | Lenovo | ThinkCentre M910q</exclude>
+        <exclude>HW | Lenovo | ThinkCentre M91p</exclude>
+        <exclude>HW | Lenovo | ThinkCentre M92z</exclude>
+        <exclude>HW | Lenovo | ThinkCentre M93p</exclude>
+        <exclude>HW | Lenovo | ThinkCentre M93z</exclude>
+        <exclude>HW | Lenovo | ThinkPad Helix</exclude>
+        <exclude>HW | Lenovo | ThinkPad T430</exclude>
+        <exclude>HW | Lenovo | ThinkPad T430s</exclude>
+        <exclude>HW | Lenovo | ThinkPad T560</exclude>
+        <exclude>HW | Lenovo | ThinkPad T61</exclude>
         <exclude>HW | Lenovo | ThinkPad X1 Carbon</exclude>
-        <exclude>HW | Lenovo | ThinkCentre M93</exclude>
+        <exclude>HW | Lenovo | ThinkPad X1 Carbon 3rd</exclude>
+        <exclude>HW | Lenovo | ThinkPad X1 Carbon 5th</exclude>
+        <exclude>HW | Lenovo | ThinkPad X1 Carbon 6th</exclude>
+        <exclude>HW | Lenovo | ThinkPad X240</exclude>
+        <exclude>HW | Lenovo | ThinkPad X250</exclude>
+        <exclude>HW | Lenovo | ThinkPad X260</exclude>
+        <exclude>HW | Lenovo | ThinkPad X270</exclude>
+        <exclude>HW | Lenovo | ThinkPad X280</exclude>
+        <exclude>HW | Lenovo | ThinkPad X390</exclude>
+        <exclude>HW | Lenovo | ThinkStation D30</exclude>
+        <exclude>HW | Lenovo | ThinkStation P310</exclude>
+        <exclude>HW | Lenovo | ThinkStation P720</exclude>
     </collection>
     <collection>
         <name>SEC | BitLocker | Enabled</name>

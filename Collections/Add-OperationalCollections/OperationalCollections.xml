@@ -145,6 +145,18 @@ Each collection accepts the following fields:
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.18363"</query>
     </collection>
     <collection>
+        <name>OS | Windows Workstation | Windows 10 | 2004 (build 19041)</name>
+        <folderpath>1. Operational\Operating System</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.19041"</query>
+    </collection>
+    <collection>
+        <name>OS | Windows Workstation | Windows 10 | 20H2 (build 19042)</name>
+        <folderpath>1. Operational\Operating System</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.19042"</query>
+    </collection>
+    <collection>
         <name>OS | Windows Workstation | Windows 10 | Other</name>
         <folderpath>Administrative\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
@@ -158,6 +170,8 @@ Each collection accepts the following fields:
         <exclude>OS | Windows Workstation | Windows 10 | 1809 (build 17763)</exclude>
         <exclude>OS | Windows Workstation | Windows 10 | 1903 (build 18362)</exclude>
         <exclude>OS | Windows Workstation | Windows 10 | 1909 (build 18363)</exclude>
+        <exclude>OS | Windows Workstation | Windows 10 | 2004 (build 19041)</exclude>
+        <exclude>OS | Windows Workstation | Windows 10 | 20H2 (build 19042)</exclude>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Other</name>

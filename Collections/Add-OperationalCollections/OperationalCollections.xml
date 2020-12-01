@@ -14,52 +14,53 @@ Each collection accepts the following fields:
 -->
     <collection>
         <name>All Systems | With Client</name>
-        <description>Operational Collection</description>
-        <folderpath>Administrative\ConfigMgr Client</folderpath>
-        <limiting>All Systems</limiting>
+        <folderpath>1. Operational\ConfigMgr Client</folderpath>
+        <limiting>ICC | All Systems</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Client = "1"</query>
-        <recurcount>1</recurcount>
-        <recurinterval>Days</recurinterval>
+        <recurcount>2</recurcount>
+        <recurinterval>Hours</recurinterval>
         <refreshtype>Both</refreshtype>
     </collection>
     <collection>
         <name>All Systems | Without Client</name>
-        <description>Operational Collection</description>
-        <folderpath>Administrative\ConfigMgr Client</folderpath>
-        <limiting>All Systems</limiting>
-        <include>All Systems</include>
+        <folderpath>1. Operational\ConfigMgr Client</folderpath>
+        <limiting>ICC | All Systems</limiting>
+        <include>ICC | All Systems</include>
         <exclude>All Systems | With Client</exclude>
     </collection>
     <collection>
         <name>All Systems | With Client (Active)</name>
-        <description>Operational Collection</description>
-        <folderpath>Administrative\ConfigMgr Client</folderpath>
+        <folderpath>1. Operational\ConfigMgr Client</folderpath>
         <limiting>All Systems | With Client</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_CH_ClientSummary on SMS_G_System_CH_ClientSummary.ResourceId = SMS_R_System.ResourceId where SMS_G_System_CH_ClientSummary.ClientActiveStatus = 1</query>
+        <recurcount>2</recurcount>
+        <recurinterval>Hours</recurinterval>
+        <refreshtype>Both</refreshtype>
     </collection>
     <collection>
         <name>All Systems | With Client (Inactive)</name>
-        <description>Operational Collection</description>
-        <folderpath>Administrative\ConfigMgr Client</folderpath>
+        <folderpath>1. Operational\ConfigMgr Client</folderpath>
         <limiting>All Systems | With Client</limiting>
         <include>All Systems | With Client</include>
         <exclude>All Systems | With Client (Active)</exclude>
     </collection>
     <collection>
         <name>OS | Windows Workstation</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>All Systems | With Client</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Workstation%"</query>
+        <recurcount>8</recurcount>
+        <recurinterval>Hours</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Server</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>All Systems | With Client</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Server%" or SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Advanced Server%"</query>
     </collection>
     <collection>
         <name>OS | Other</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>All Systems | With Client</limiting>
         <include>All Systems | With Client</include>
         <exclude>OS | Windows Workstation</exclude>
@@ -68,97 +69,145 @@ Each collection accepts the following fields:
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 7</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Workstation 6.1%"</query>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 8</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Workstation 6.2%"</query>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 8.1</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Workstation 6.3%"</query>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Workstation 10.0%"</query>
+        <recurcount>8</recurcount>
+        <recurinterval>Hours</recurinterval>
+    </collection>
+    <collection>
+        <name>OS | Windows Workstation | Windows 10 | Enterprise Edition</name>
+        <folderpath>1. Operational\Operating System\Win 10 Editions</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_OPERATING_SYSTEM on SMS_G_System_OPERATING_SYSTEM.ResourceId = SMS_R_System.ResourceId where SMS_G_System_OPERATING_SYSTEM.Caption like "Microsoft Windows 10 Enterprise%"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
+    </collection>
+    <collection>
+        <name>OS | Windows Workstation | Windows 10 | Enterprise Edition | WVD</name>
+        <folderpath>1. Operational\Operating System\Win 10 Editions</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10 | Enterprise Edition</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_OPERATING_SYSTEM on SMS_G_System_OPERATING_SYSTEM.ResourceId = SMS_R_System.ResourceId where SMS_G_System_OPERATING_SYSTEM.Caption like "Microsoft Windows 10 Enterprise for Virtual Desktops"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
+    </collection>
+    <collection>
+        <name>OS | Windows Workstation | Windows 10 | Professional Edition</name>
+        <folderpath>1. Operational\Operating System\Win 10 Editions</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_OPERATING_SYSTEM on SMS_G_System_OPERATING_SYSTEM.ResourceId = SMS_R_System.ResourceId where SMS_G_System_OPERATING_SYSTEM.Caption like "Microsoft Windows 10 Pro%"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10 | 1507 (build 10240)</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.10240"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10 | 1511 (build 10586)</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.10586"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10 | 1607 (build 14393)</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.14393"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10 | 1703 (build 15063)</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.15063"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10 | 1709 (build 16299)</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.16299"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10 | 1803 (build 17134)</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.17134"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10 | 1809 (build 17763)</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.17763"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10 | 1903 (build 18362)</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.18362"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10 | 1909 (build 18363)</name>
         <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.18363"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10 | 2004 (build 19041)</name>
         <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.19041"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10 | 20H2 (build 19042)</name>
         <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.19042"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>OS | Windows Workstation | Windows 10 | Other</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <include>OS | Windows Workstation | Windows 10</include>
         <exclude>OS | Windows Workstation | Windows 10 | 1507 (build 10240)</exclude>
@@ -175,7 +224,7 @@ Each collection accepts the following fields:
     </collection>
     <collection>
         <name>OS | Windows Workstation | Other</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <include>OS | Windows Workstation</include>
         <exclude>OS | Windows Workstation | Windows 7</exclude>
@@ -185,37 +234,37 @@ Each collection accepts the following fields:
     </collection>
     <collection>
         <name>OS | Windows Server | Windows Server 2008 R2</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Server</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Server 6.1%" or SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Advanced Server 6.1%"</query>
     </collection>
     <collection>
         <name>OS | Windows Server | Windows Server 2012</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Server</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Server 6.2%" or SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Advanced Server 6.2%"</query>
     </collection>
     <collection>
         <name>OS | Windows Server | Windows Server 2012 R2</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Server</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Server 6.3%" or SMS_R_System.OperatingSystemNameandVersion like "Microsoft Windows NT Advanced Server 6.3%"</query>
     </collection>
     <collection>
         <name>OS | Windows Server | Windows Server 2016</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Server</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.14393"</query>
     </collection>
     <collection>
         <name>OS | Windows Server | Windows Server 2019</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Server</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.Build = "10.0.17763"</query>
     </collection>
     <collection>
         <name>OS | Windows Server | Other</name>
-        <folderpath>Administrative\Operating System</folderpath>
+        <folderpath>1. Operational\Operating System</folderpath>
         <limiting>OS | Windows Server</limiting>
         <include>OS | Windows Server</include>
         <exclude>OS | Windows Server | Windows Server 2008 R2</exclude>
@@ -227,31 +276,79 @@ Each collection accepts the following fields:
     <collection>
         <name>WaaS | Windows 10 Current Branch (CB)</name>
         <description>Windows 10 Current Branch (CB) / Do not defer upgrades</description>
-        <folderpath>Administrative\Operating System\WaaS</folderpath>
+        <folderpath>1. Operational\Operating System\WaaS</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OSBranch = 0</query>
     </collection>
     <collection>
         <name>WaaS | Windows 10 Current Branch for Business (CBB)</name>
         <description>Windows 10 Current Branch for Business (CBB) / Defer upgrades</description>
-        <folderpath>Administrative\Operating System\WaaS</folderpath>
+        <folderpath>1. Operational\Operating System\WaaS</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OSBranch = 1</query>
     </collection>
     <collection>
         <name>WaaS | Windows 10 Long Term Servicing Branch (LTSB)</name>
-        <folderpath>Administrative\Operating System\WaaS</folderpath>
+        <folderpath>1. Operational\Operating System\WaaS</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System where SMS_R_System.OSBranch = 2</query>
     </collection>
     <collection>
         <name>WaaS | Windows 10 Unknown</name>
-        <folderpath>Administrative\Operating System\WaaS</folderpath>
+        <folderpath>1. Operational\Operating System\WaaS</folderpath>
         <limiting>OS | Windows Workstation | Windows 10</limiting>
         <include>OS | Windows Workstation | Windows 10</include>
         <exclude>WaaS | Windows 10 Current Branch (CB)</exclude>
         <exclude>WaaS | Windows 10 Current Branch for Business (CBB)</exclude>
         <exclude>WaaS | Windows 10 Long Term Servicing Branch (LTSB)</exclude>
+    </collection>
+    <collection>
+        <name>WaaS | 1909 | CompatScanStatus | Success</name>
+        <folderpath>1. Operational\Operating System\WaaS</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_UNICC_WaaS on SMS_G_System_UNICC_WaaS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_UNICC_WaaS.KeyName = "1909" and SMS_G_System_UNICC_WaaS.CompatScanStatus = "0"</query>
+    </collection>
+    <collection>
+        <name>WaaS | 1909 | CompatScanStatus | Failed</name>
+        <folderpath>1. Operational\Operating System\WaaS</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_UNICC_WaaS on SMS_G_System_UNICC_WaaS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_UNICC_WaaS.KeyName = "1909" and SMS_G_System_UNICC_WaaS.CompatScanStatus = "1"</query>
+    </collection>
+    <collection>
+        <name>WaaS | 1909 | PreCacheStatus | Success</name>
+        <folderpath>1. Operational\Operating System\WaaS</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_UNICC_WaaS on SMS_G_System_UNICC_WaaS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_UNICC_WaaS.KeyName = "1909" and SMS_G_System_UNICC_WaaS.PreCacheStatus = "0"</query>
+    </collection>
+    <collection>
+        <name>WaaS | 1909 | PreCacheStatus | Failed</name>
+        <folderpath>1. Operational\Operating System\WaaS</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_UNICC_WaaS on SMS_G_System_UNICC_WaaS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_UNICC_WaaS.KeyName = "1909" and SMS_G_System_UNICC_WaaS.PreCacheStatus = "1"</query>
+    </collection>
+    <collection>
+        <name>WaaS | 1909 | ReadinessStatus | Success</name>
+        <folderpath>1. Operational\Operating System\WaaS</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_UNICC_WaaS on SMS_G_System_UNICC_WaaS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_UNICC_WaaS.KeyName = "1909" and SMS_G_System_UNICC_WaaS.ReadinessStatus = "0"</query>
+    </collection>
+    <collection>
+        <name>WaaS | 1909 | ReadinessStatus | Failed</name>
+        <folderpath>1. Operational\Operating System\WaaS</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_UNICC_WaaS on SMS_G_System_UNICC_WaaS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_UNICC_WaaS.KeyName = "1909" and SMS_G_System_UNICC_WaaS.ReadinessStatus = "1"</query>
+    </collection>
+    <collection>
+        <name>WaaS | 1909 | UpgradeStatus | Success</name>
+        <folderpath>1. Operational\Operating System\WaaS</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_UNICC_WaaS on SMS_G_System_UNICC_WaaS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_UNICC_WaaS.KeyName = "1909" and SMS_G_System_UNICC_WaaS.UpgradeStatus = "0"</query>
+    </collection>
+    <collection>
+        <name>WaaS | 1909 | UpgradeStatus | Failed</name>
+        <folderpath>1. Operational\Operating System\WaaS</folderpath>
+        <limiting>OS | Windows Workstation | Windows 10</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_UNICC_WaaS on SMS_G_System_UNICC_WaaS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_UNICC_WaaS.KeyName = "1909" and SMS_G_System_UNICC_WaaS.UpgradeStatus = "1"</query>
     </collection>
     <collection>
         <name>O365 | Office 365 Installed</name>
@@ -273,10 +370,40 @@ Each collection accepts the following fields:
         <exclude>O365 | Managed Systems</exclude>
     </collection>
     <collection>
+        <name>O365 | Update Channel | Current Channel (Preview)</name>
+        <folderpath>1. Operational\Office 365</folderpath>
+        <limiting>O365 | Office 365 Installed</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS on SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS.GPOChannel = "FirstReleaseCurrent"</query>
+    </collection>
+    <collection>
+        <name>O365 | Update Channel | Current Channel</name>
+        <folderpath>1. Operational\Office 365</folderpath>
+        <limiting>O365 | Office 365 Installed</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS on SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS.GPOChannel = "Current"</query>
+    </collection>
+    <collection>
+        <name>O365 | Update Channel | Monthly Enterprise Channel</name>
+        <folderpath>1. Operational\Office 365</folderpath>
+        <limiting>O365 | Office 365 Installed</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS on SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS.GPOChannel = "MonthlyEnterprise"</query>
+    </collection>
+    <collection>
+        <name>O365 | Update Channel | Semi-Annual Enterprise Channel (Preview)</name>
+        <folderpath>1. Operational\Office 365</folderpath>
+        <limiting>O365 | Office 365 Installed</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS on SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS.GPOChannel = "FirstReleaseDeferred"</query>
+    </collection>
+    <collection>
+        <name>O365 | Update Channel | Semi-Annual Enterprise Channel</name>
+        <folderpath>1. Operational\Office 365</folderpath>
+        <limiting>O365 | Office 365 Installed</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS on SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_OFFICE365PROPLUSCONFIGURATIONS.GPOChannel = "Deferred"</query>
+    </collection>
+    <collection>
         <name>App | ConfigMgr Console</name>
         <folderpath>1. Operational\Applications</folderpath>
         <limiting>All Systems | With Client (Active)</limiting>
-        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_ADD_REMOVE_PROGRAMS on SMS_G_System_ADD_REMOVE_PROGRAMS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_ADD_REMOVE_PROGRAMS.DisplayName = "System Center Configuration Manager Console"</query>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_ADD_REMOVE_PROGRAMS on SMS_G_System_ADD_REMOVE_PROGRAMS.ResourceId = SMS_R_System.ResourceId where SMS_G_System_ADD_REMOVE_PROGRAMS.DisplayName = "System Center Configuration Manager Console" or SMS_G_System_ADD_REMOVE_PROGRAMS.DisplayName = "Microsoft Endpoint Configuration Manager Console"</query>
     </collection>
     <collection>
         <name>Chassis | Virtual</name>
@@ -306,37 +433,47 @@ Each collection accepts the following fields:
     </collection>
     <collection>
         <name>HW | Dell</name>
-        <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
+        <folderpath>1. Operational\Hardware Models\Manufacturers</folderpath>
         <limiting>All Systems | With Client (Active)</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "Dell Inc."</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>HW | HP</name>
-        <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
+        <folderpath>1. Operational\Hardware Models\Manufacturers</folderpath>
         <limiting>All Systems | With Client (Active)</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where (SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "Hewlett-Packard" or SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "HP")</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>HW | Lenovo</name>
-        <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
+        <folderpath>1. Operational\Hardware Models\Manufacturers</folderpath>
         <limiting>All Systems | With Client (Active)</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "LENOVO"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>HW | Microsoft</name>
-        <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
+        <folderpath>1. Operational\Hardware Models\Manufacturers</folderpath>
         <limiting>All Systems | With Client (Active)</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "Microsoft Corporation"</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>HW | VMware</name>
-        <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
+        <folderpath>1. Operational\Hardware Models\Manufacturers</folderpath>
         <limiting>All Systems | With Client (Active)</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "VMware, Inc."</query>
+        <recurcount>1</recurcount>
+        <recurinterval>Days</recurinterval>
     </collection>
     <collection>
         <name>HW | Unknown Manufacturer</name>
-        <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
+        <folderpath>1. Operational\Hardware Models\Manufacturers</folderpath>
         <limiting>All Systems | With Client (Active)</limiting>
         <include>All Systems | With Client (Active)</include>
         <exclude>HW | Dell</exclude>
@@ -347,7 +484,7 @@ Each collection accepts the following fields:
     </collection>
     <collection>
         <name>HW | Microsoft | Surface Pro 4</name>
-        <folderpath>Administrative\Hardware Models\Models - Microsoft</folderpath>
+        <folderpath>1. Operational\Hardware Models\Models - Microsoft</folderpath>
         <limiting>HW | Microsoft</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "Microsoft Corporation" and SMS_G_System_COMPUTER_SYSTEM.Model like "Surface Pro 4%"</query>
     </collection>
@@ -359,20 +496,20 @@ Each collection accepts the following fields:
     </collection>
     <collection>
         <name>HW | Microsoft | Surface Studio</name>
-        <folderpath>Administrative\Hardware Models\Models - Microsoft</folderpath>
+        <folderpath>1. Operational\Hardware Models\Models - Microsoft</folderpath>
         <limiting>HW | Microsoft</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "Microsoft Corporation" and SMS_G_System_COMPUTER_SYSTEM.Model like "Surface Studio%"</query>
     </collection>
     <collection>
         <name>HW | Microsoft | Hyper-V VM</name>
-        <folderpath>Administrative\Hardware Models\Models - Microsoft</folderpath>
+        <folderpath>1. Operational\Hardware Models\Models - Microsoft</folderpath>
         <limiting>HW | Microsoft</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Manufacturer = "Microsoft Corporation" and SMS_G_System_COMPUTER_SYSTEM.Model = "Virtual Machine"</query>
     </collection>
     <collection>
         <name>HW | Microsoft | Unclassified</name>
         <description>Contains all Microsoft hardware not included in model specific collections</description>
-        <folderpath>Administrative\Hardware Models\Manufacturers</folderpath>
+        <folderpath>1. Operational\Hardware Models\Manufacturers</folderpath>
         <limiting>HW | Microsoft</limiting>
         <include>HW | Microsoft</include>
         <exclude>HW | Microsoft | Surface Pro 4</exclude>
@@ -385,6 +522,12 @@ Each collection accepts the following fields:
         <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
         <limiting>HW | Dell</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Inspiron 5523"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude 5400</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude 5400"</query>
     </collection>
     <collection>
         <name>HW | Dell | Latitude 7280</name>
@@ -415,6 +558,12 @@ Each collection accepts the following fields:
         <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
         <limiting>HW | Dell</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude 7400"</query>
+    </collection>
+    <collection>
+        <name>HW | Dell | Latitude 7400 2-in-1</name>
+        <folderpath>1. Operational\Hardware Models\Models - Dell</folderpath>
+        <limiting>HW | Dell</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM on SMS_G_System_COMPUTER_SYSTEM.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM.Model = "Latitude 7400 2-in-1"</query>
     </collection>
     <collection>
         <name>HW | Dell | Latitude 7480</name>
@@ -591,11 +740,13 @@ Each collection accepts the following fields:
         <limiting>HW | Dell</limiting>
         <include>HW | Dell</include>
         <exclude>HW | Dell | Inspiron 5523</exclude>
+        <exclude>HW | Dell | Latitude 5400</exclude>
         <exclude>HW | Dell | Latitude 7280</exclude>
         <exclude>HW | Dell | Latitude 7370</exclude>
         <exclude>HW | Dell | Latitude 7380</exclude>
         <exclude>HW | Dell | Latitude 7390</exclude>
         <exclude>HW | Dell | Latitude 7400</exclude>
+        <exclude>HW | Dell | Latitude 7400 2-in-1</exclude>
         <exclude>HW | Dell | Latitude 7480</exclude>
         <exclude>HW | Dell | Latitude 7490</exclude>
         <exclude>HW | Dell | Latitude E4310</exclude>
@@ -822,6 +973,18 @@ Each collection accepts the following fields:
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad T430s"</query>
     </collection>
     <collection>
+        <name>HW | Lenovo | ThinkPad T480</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad T480"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad T480s</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad T480s"</query>
+    </collection>
+    <collection>
         <name>HW | Lenovo | ThinkPad T560</name>
         <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
         <limiting>HW | Lenovo</limiting>
@@ -856,6 +1019,12 @@ Each collection accepts the following fields:
         <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
         <limiting>HW | Lenovo</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad X1 Carbon 6th"</query>
+    </collection>
+    <collection>
+        <name>HW | Lenovo | ThinkPad X1 Carbon 7th</name>
+        <folderpath>1. Operational\Hardware Models\Models - Lenovo</folderpath>
+        <limiting>HW | Lenovo</limiting>
+        <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_COMPUTER_SYSTEM_PRODUCT on SMS_G_System_COMPUTER_SYSTEM_PRODUCT.ResourceID = SMS_R_System.ResourceId where SMS_G_System_COMPUTER_SYSTEM_PRODUCT.Version = "ThinkPad X1 Carbon 7th"</query>
     </collection>
     <collection>
         <name>HW | Lenovo | ThinkPad X240</name>
@@ -931,12 +1100,15 @@ Each collection accepts the following fields:
         <exclude>HW | Lenovo | ThinkPad Helix</exclude>
         <exclude>HW | Lenovo | ThinkPad T430</exclude>
         <exclude>HW | Lenovo | ThinkPad T430s</exclude>
+        <exclude>HW | Lenovo | ThinkPad T480</exclude>
+        <exclude>HW | Lenovo | ThinkPad T480s</exclude>
         <exclude>HW | Lenovo | ThinkPad T560</exclude>
         <exclude>HW | Lenovo | ThinkPad T61</exclude>
         <exclude>HW | Lenovo | ThinkPad X1 Carbon</exclude>
         <exclude>HW | Lenovo | ThinkPad X1 Carbon 3rd</exclude>
         <exclude>HW | Lenovo | ThinkPad X1 Carbon 5th</exclude>
         <exclude>HW | Lenovo | ThinkPad X1 Carbon 6th</exclude>
+        <exclude>HW | Lenovo | ThinkPad X1 Carbon 7th</exclude>
         <exclude>HW | Lenovo | ThinkPad X240</exclude>
         <exclude>HW | Lenovo | ThinkPad X250</exclude>
         <exclude>HW | Lenovo | ThinkPad X260</exclude>
@@ -949,78 +1121,78 @@ Each collection accepts the following fields:
     </collection>
     <collection>
         <name>SEC | BitLocker | Enabled</name>
-        <folderpath>Administrative\Security</folderpath>
+        <folderpath>1. Operational\Security</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_ENCRYPTABLE_VOLUME on SMS_G_System_ENCRYPTABLE_VOLUME.ResourceId = SMS_R_System.ResourceId where SMS_G_System_ENCRYPTABLE_VOLUME.DriveLetter = "C:" and SMS_G_System_ENCRYPTABLE_VOLUME.ProtectionStatus = 1</query>
     </collection>
     <collection>
         <name>SEC | BitLocker | Not Enabled</name>
-        <folderpath>Administrative\Security</folderpath>
+        <folderpath>1. Operational\Security</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <include>OS | Windows Workstation</include>
         <exclude>SEC | BitLocker | Enabled</exclude>
     </collection>
     <collection>
         <name>SEC | Secure Boot | Enabled</name>
-        <folderpath>Administrative\Security</folderpath>
+        <folderpath>1. Operational\Security</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_FIRMWARE on SMS_G_System_FIRMWARE.ResourceId = SMS_R_System.ResourceId where SMS_G_System_FIRMWARE.SecureBoot = 1</query>
     </collection>
     <collection>
         <name>SEC | Secure Boot | Not Enabled</name>
-        <folderpath>Administrative\Security</folderpath>
+        <folderpath>1. Operational\Security</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <include>OS | Windows Workstation</include>
         <exclude>SEC | Secure Boot | Enabled</exclude>
     </collection>
     <collection>
         <name>SEC | TPM | Activated</name>
-        <folderpath>Administrative\Security</folderpath>
+        <folderpath>1. Operational\Security</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_TPM on SMS_G_System_TPM.ResourceId = SMS_R_System.ResourceId where SMS_G_System_TPM.IsActivated_InitialValue = 1</query>
     </collection>
     <collection>
         <name>SEC | TPM | Not Activated</name>
-        <folderpath>Administrative\Security</folderpath>
+        <folderpath>1. Operational\Security</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <include>OS | Windows Workstation</include>
         <exclude>SEC | TPM | Activated</exclude>
     </collection>
     <collection>
         <name>SEC | TPM | Enabled</name>
-        <folderpath>Administrative\Security</folderpath>
+        <folderpath>1. Operational\Security</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_TPM on SMS_G_System_TPM.ResourceId = SMS_R_System.ResourceId where SMS_G_System_TPM.IsEnabled_InitialValue = 1</query>
     </collection>
     <collection>
         <name>SEC | TPM | Not Enabled</name>
-        <folderpath>Administrative\Security</folderpath>
+        <folderpath>1. Operational\Security</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <include>OS | Windows Workstation</include>
         <exclude>SEC | TPM | Enabled</exclude>
     </collection>
     <collection>
         <name>SEC | TPM | Owned</name>
-        <folderpath>Administrative\Security</folderpath>
+        <folderpath>1. Operational\Security</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_TPM on SMS_G_System_TPM.ResourceId = SMS_R_System.ResourceId where SMS_G_System_TPM.IsOwned_InitialValue = 1</query>
     </collection>
     <collection>
         <name>SEC | TPM | Not Owned</name>
-        <folderpath>Administrative\Security</folderpath>
+        <folderpath>1. Operational\Security</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <include>OS | Windows Workstation</include>
         <exclude>SEC | TPM | Owned</exclude>
     </collection>
     <collection>
         <name>SEC | UEFI | Enabled</name>
-        <folderpath>Administrative\Security</folderpath>
+        <folderpath>1. Operational\Security</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <query>select SMS_R_SYSTEM.ResourceID,SMS_R_SYSTEM.ResourceType,SMS_R_SYSTEM.Name,SMS_R_SYSTEM.SMSUniqueIdentifier,SMS_R_SYSTEM.ResourceDomainORWorkgroup,SMS_R_SYSTEM.Client from SMS_R_System inner join SMS_G_System_FIRMWARE on SMS_G_System_FIRMWARE.ResourceId = SMS_R_System.ResourceId where SMS_G_System_FIRMWARE.UEFI = 1</query>
     </collection>
     <collection>
         <name>SEC | UEFI | Not Enabled</name>
-        <folderpath>Administrative\Security</folderpath>
+        <folderpath>1. Operational\Security</folderpath>
         <limiting>OS | Windows Workstation</limiting>
         <include>OS | Windows Workstation</include>
         <exclude>SEC | UEFI | Enabled</exclude>

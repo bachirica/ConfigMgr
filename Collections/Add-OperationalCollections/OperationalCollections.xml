@@ -670,6 +670,7 @@ Each collection accepts the following fields:
         <exclude>HW | Dell | Latitude 7380</exclude>
         <exclude>HW | Dell | Latitude 7390</exclude>
         <exclude>HW | Dell | Latitude 7400</exclude>
+        <exclude>HW | Dell | Latitude 7400 2-in-1</exclude>
         <exclude>HW | Dell | Latitude 7480</exclude>
         <exclude>HW | Dell | Latitude 7490</exclude>
         <exclude>HW | Dell | Latitude E4310</exclude>
